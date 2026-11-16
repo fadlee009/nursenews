@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ลงเวลา MICU 2(240)</title>
+<meta name="theme-color" content="#0f6e6e">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ===== ตั้งค่า: วาง URL เว็บแอปของ Apps Script ไว้ในสคริปต์ด้านล่าง (API_URL) ===== */
+  :root {
+    --bg: #f3f6f6; --card: #ffffff; --ink: #14302f; --muted: #5d7473; --line: #dde6e5;
+    --brand: #0f6e6e; --brand-ink: #ffffff; --brand-soft: #e2f1f0;
+    --ok: #1d7a46; --ok-soft: #e3f3e9; --warn: #9a5b00; --warn-soft: #fdf0dc;
+    --bad: #b3261e; --bad-soft: #fbe5e3; --out: #3d4f8a; --out-soft: #e7eaf6;
+    --shadow: 0 1px 2px rgba(10,40,40,.06), 0 4px 16px rgba(10,40,40,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e1717; --card: #152222; --ink: #e4efee; --muted: #93abaa; --line: #24393a;
+      --brand: #3fb4ad; --brand-ink: #062020; --brand-soft: #173a39;
+      --ok: #5fd08f; --ok-soft: #15301f; --warn: #f0b356; --warn-soft: #33270f;
+      --bad: #ff8a80; --bad-soft: #3a1714; --out: #9fb0ef; --out-soft: #1c2340;
+      --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1717; --card: #152222; --ink: #e4efee; --muted: #93abaa; --line: #24393a;
+    --brand: #3fb4ad; --brand-ink: #062020; --brand-soft: #173a39;
+    --ok: #5fd08f; --ok-soft: #15301f; --warn: #f0b356; --warn-soft: #33270f;
+    --bad: #ff8a80; --bad-soft: #3a1714; --out: #9fb0ef; --out-soft: #1c2340;
+    --shadow: none;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: "Sarabun", "Noto Sans Thai", system-ui, sans-serif; font-size: 16px; line-height: 1.5;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 0 16px calc(32px + env(safe-area-inset-bottom)); }
+  header.top {
+    background: var(--brand); color: var(--brand-ink);
+    padding: calc(14px + env(safe-area-inset-top)) 16px 64px;
+  }
+  header.top .inner { max-width: 480px; margin: 0 auto; }
+  .ward { font-size: 14px; opacity: .85; font-weight: 500; letter-spacing: .02em; }
+  h1 { margin: 2px 0 0; font-size: 20px; font-weight: 700; }
+  .clock-card { margin-top: -48px; text-align: center; padding: 18px 16px 16px; }
+  .clock { font-size: 52px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.05; letter-spacing: .01em; }
+  .clock small { font-size: 22px; color: var(--muted); font-weight: 600; }
+  .date { color: var(--muted); margin-top: 4px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); margin-bottom: 12px; }
+  .pad { padding: 16px; }
+  label.lbl { display: block; font-size: 14px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+  select, input[type=search] {
+    width: 100%; font: inherit; font-size: 17px; color: var(--ink); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; min-height: 48px;
+  }
+  select:focus, input:focus, button:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 40%, transparent); outline-offset: 1px; }
+  .row { display: flex; align-items: center; gap: 12px; }
+  .between { justify-content: space-between; }
+  .muted { color: var(--muted); }
+  .small { font-size: 14px; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 14px; font-weight: 600; }
+  .pill.ok { background: var(--ok-soft); color: var(--ok); }
+  .pill.warn { background: var(--warn-soft); color: var(--warn); }
+  .pill.bad { background: var(--bad-soft); color: var(--bad); }
+  .pill.info { background: var(--brand-soft); color: var(--brand); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .gps-dist { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .meter { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 10px 0 6px; }
+  .meter > i { display: block; height: 100%; width: 0; background: var(--ok); border-radius: 99px; transition: width .4s, background .4s; }
+  .linkbtn { background: none; border: 0; color: var(--brand); font: inherit; font-weight: 600; padding: 8px 4px; cursor: pointer; min-height: 40px; }
+  .shifts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .shift {
+    border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 12px;
+    padding: 10px 4px; font: inherit; cursor: pointer; min-height: 64px; text-align: center;
+  }
+  .shift b { display: block; font-size: 18px; }
+  .shift span { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .shift[aria-pressed="true"] { border-color: var(--brand); background: var(--brand-soft); box-shadow: inset 0 0 0 1px var(--brand); }
+  .shift .now { display: block; font-size: 11px; color: var(--brand); font-weight: 700; height: 14px; }
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .big {
+    border: 0; border-radius: 16px; font: inherit; font-size: 19px; font-weight: 700; min-height: 72px;
+    cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    transition: transform .08s, opacity .2s;
+  }
+  .big small { font-size: 13px; font-weight: 500; opacity: .85; }
+  .big:active { transform: scale(.98); }
+  .big.in { background: var(--brand); color: var(--brand-ink); }
+  .big.out { background: var(--out); color: #fff; }
+  :root[data-theme="dark"] .big.out { color: #0d1430; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .big.out { color: #0d1430; } }
+  .big[disabled] { opacity: .38; cursor: not-allowed; }
+  .status-open { border-left: 4px solid var(--brand); }
+  .hist { list-style: none; margin: 0; padding: 0; }
+  .hist li { padding: 12px 0; border-top: 1px solid var(--line); }
+  .hist li:first-child { border-top: 0; }
+  .hist .t { font-variant-numeric: tabular-nums; }
+  .banner { background: var(--warn-soft); color: var(--warn); border-radius: 12px; padding: 10px 14px; font-size: 14px; margin-bottom: 12px; }
+  .toast {
+    position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px);
+    width: calc(100% - 32px); max-width: 448px; padding: 14px 16px; border-radius: 14px; font-weight: 600;
+    opacity: 0; pointer-events: none; transition: .25s; white-space: pre-line; z-index: 10; box-shadow: 0 8px 28px rgba(0,0,0,.18);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.ok { background: var(--ok); color: #fff; }
+  .toast.bad { background: var(--bad); color: #fff; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .toast { color: #0b1515 !important; } }
+  .spin { width: 18px; height: 18px; border: 2.5px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: sp .7s linear infinite; display: inline-block; vertical-align: -3px; }
+  @keyframes sp { to { transform: rotate(360deg); } }
+  .coords { font-family: ui-monospace, monospace; font-size: 13px; word-break: break-all; }
+  footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 18px; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="inner">
+    <div class="ward" id="wardName">MICU 2(240)</div>
+    <h1>ลงเวลาปฏิบัติงานพยาบาล</h1>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card clock-card" aria-live="off">
+    <div class="clock" id="clock">--:--<small>:--</small></div>
+    <div class="date" id="date">&nbsp;</div>
+  </section>
+
+  <div class="banner hidden" id="demoBanner">
+    โหมดทดลอง: ยังไม่ได้เชื่อม Google Sheets ข้อมูลจะเก็บในเครื่องนี้เท่านั้น
+    (ใส่ API_URL ใน index.html ตามคู่มือ README)
+  </div>
+
+  <section class="card pad">
+    <label class="lbl" for="staff">ชื่อผู้ลงเวลา</label>
+    <select id="staff"><option value="">กำลังโหลดรายชื่อ…</option></select>
+  </section>
+
+  <section class="card pad status-open hidden" id="openCard" aria-live="polite">
+    <div class="row between">
+      <span class="pill info"><span class="dot"></span>กำลังปฏิบัติงาน</span>
+      <span class="small muted" id="openDate"></span>
+    </div>
+    <div style="margin-top:8px;font-size:18px;font-weight:600" id="openText"></div>
+  </section>
+
+  <section class="card pad" aria-live="polite">
+    <div class="row between">
+      <span class="lbl" style="margin:0">ตำแหน่งปัจจุบัน</span>
+      <span id="gpsPill" class="pill warn"><span class="dot"></span>กำลังหาตำแหน่ง</span>
+    </div>
+    <div class="row between" style="margin-top:6px">
+      <div><span class="gps-dist" id="gpsDist">–</span> <span class="muted small" id="gpsUnit"></span></div>
+      <button class="linkbtn" id="gpsRefresh" type="button">หาตำแหน่งใหม่</button>
+    </div>
+    <div class="meter" aria-hidden="true"><i id="gpsMeter"></i></div>
+    <div class="small muted" id="gpsNote">อนุญาตการเข้าถึงตำแหน่งเพื่อยืนยันว่าอยู่ในหอผู้ป่วย</div>
+    <details class="small muted" style="margin-top:8px">
+      <summary>พิกัดของเครื่องนี้ (สำหรับผู้ดูแลตั้งค่า)</summary>
+      <div class="coords" id="gpsCoords" style="margin-top:6px">-</div>
+      <button class="linkbtn" id="copyCoords" type="button">คัดลอกพิกัด</button>
+    </details>
+  </section>
+
+  <section class="card pad">
+    <div class="lbl">เลือกเวร</div>
+    <div class="shifts" id="shifts" role="group" aria-label="เลือกเวร"></div>
+  </section>
+
+  <section class="actions" style="margin-bottom:12px">
+    <button class="big in" id="btnIn" type="button" disabled>ลงเวลาเข้า<small id="btnInSub">เข้างาน</small></button>
+    <button class="big out" id="btnOut" type="button" disabled>ลงเวลาออก<small>ออกงาน</small></button>
+  </section>
+
+  <section class="card pad">
+    <div class="row between">
+      <span class="lbl" style="margin:0">ประวัติล่าสุด</span>
+      <button class="linkbtn" id="reload" type="button">รีเฟรช</button>
+    </div>
+    <ul class="hist" id="hist"><li class="muted small">เลือกชื่อเพื่อดูประวัติ</li></ul>
+  </section>
+
+  <footer>หอผู้ป่วย MICU 2(240) · เวลาอ้างอิงจากเซิร์ฟเวอร์ (เวลาประเทศไทย)</footer>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="assertive"></div>
+
+<script>
+/* =====================================================================
+ * ตั้งค่า: วาง URL เว็บแอป Apps Script (ลงท้าย /exec) ระหว่างเครื่องหมาย ''
+ * ถ้าเว้นว่างไว้ แอปจะทำงานใน "โหมดทดลอง" เก็บข้อมูลในเครื่องนี้เท่านั้น
+ * ===================================================================== */
+const API_URL = '';
+
+const TZ_OFF = 7 * 3600 * 1000;
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+const $ = (id) => document.getElementById(id);
+const state = { cfg: null, pos: null, shift: null, open: null, busy: false, clockSkew: 0 };
+
+/* ---------- เวลา ---------- */
+const TH_DAYS = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+const TH_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const pad = (n) => String(n).padStart(2, '0');
+const now = () => Date.now() + state.clockSkew;
+function bkk(ms) { return new Date(ms + TZ_OFF); }
+function bkkDateStr(ms) { const d = bkk(ms); return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`; }
+function hm(ms) { const d = bkk(ms); return `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`; }
+function thaiDate(ds) { const [y,m,d] = ds.split('-').map(Number); return `${d}/${m}/${y+543}`; }
+function tick() {
+  const d = bkk(now());
+  $('clock').innerHTML = `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}<small>:${pad(d.getUTCSeconds())}</small>`;
+  $('date').textContent = `วัน${TH_DAYS[d.getUTCDay()]}ที่ ${d.getUTCDate()} ${TH_MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()+543}`;
+}
+
+/* ---------- เวร ---------- */
+const hmToMin = (s) => { const [h,m] = s.split(':').map(Number); return h*60 + (m||0); };
+function shiftBounds(sh, ds) {
+  const [y,m,d] = ds.split('-').map(Number);
+  const day = Date.UTC(y, m-1, d) - TZ_OFF;
+  const s = hmToMin(sh.start); let e = hmToMin(sh.end); if (e <= s) e += 1440;
+  return { start: day + s*60000, end: day + e*60000 };
+}
+function shiftWindow(sh, t, openBefore) {
+  for (let off = -1; off <= 1; off++) {
+    const ds = bkkDateStr(t + off*86400000), b = shiftBounds(sh, ds);
+    if (t >= b.start - openBefore*60000 && t < b.end) return { date: ds, ...b };
+  }
+  return null;
+}
+/** เวรที่แนะนำ = เวรที่เปิดให้ลงเวลาเข้าได้ขณะนี้ และเริ่มช้าที่สุด (เช่น 15:30 แนะนำเวรบ่าย) */
+function suggestShift() {
+  const t = now(), c = state.cfg; let best = null;
+  c.shifts.forEach(sh => { const w = shiftWindow(sh, t, c.openBeforeMin); if (w && (!best || w.start > best.w.start)) best = { sh, w }; });
+  return best ? best.sh.code : null;
+}
+function renderShifts() {
+  const c = state.cfg, t = now(), box = $('shifts');
+  const cur = c.shifts.find(sh => { const w = shiftWindow(sh, t, 0); return w; });
+  box.innerHTML = '';
+  c.shifts.forEach(sh => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'shift';
+    b.setAttribute('aria-pressed', String(state.shift === sh.code));
+    b.innerHTML = `<span class="now">${cur && cur.code === sh.code ? 'เวรขณะนี้' : ''}</span><b>${sh.name}</b><span>${sh.start}–${sh.end}</span>`;
+    b.onclick = () => { state.shift = sh.code; renderShifts(); updateButtons(); };
+    box.appendChild(b);
+  });
+}
+
+/* ---------- GPS ---------- */
+function haversine(a, b, c, d) {
+  const R = 6371000, r = Math.PI/180, dLa = (c-a)*r, dLo = (d-b)*r;
+  const x = Math.sin(dLa/2)**2 + Math.cos(a*r)*Math.cos(c*r)*Math.sin(dLo/2)**2;
+  return 2*R*Math.asin(Math.sqrt(x));
+}
+let watchId = null;
+function startGps() {
+  if (!('geolocation' in navigator)) { setGpsUi('bad', 'อุปกรณ์ไม่รองรับ GPS'); return; }
+  if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+  setGpsUi('warn', 'กำลังหาตำแหน่ง');
+  watchId = navigator.geolocation.watchPosition(onPos, onPosErr, { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 });
+}
+function onPos(p) {
+  state.pos = { lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy, at: Date.now() };
+  if (!API_URL && state.cfg && state.cfg.lat == null) { state.cfg.lat = state.pos.lat; state.cfg.lng = state.pos.lng; }
+  renderGps(); updateButtons();
+}
+function onPosErr(e) {
+  const msg = e.code === 1 ? 'ไม่ได้รับอนุญาตให้เข้าถึงตำแหน่ง — เปิดสิทธิ์ตำแหน่งในการตั้งค่าเบราว์เซอร์' :
+              e.code === 3 ? 'หาตำแหน่งไม่ทัน — ลองกด "หาตำแหน่งใหม่" หรือไปใกล้หน้าต่าง' : 'หาตำแหน่งไม่ได้';
+  setGpsUi('bad', 'ไม่พบตำแหน่ง'); $('gpsNote').textContent = msg; updateButtons();
+}
+function setGpsUi(kind, text) { const p = $('gpsPill'); p.className = 'pill ' + kind; p.innerHTML = `<span class="dot"></span>${text}`; }
+function distance() {
+  const c = state.cfg, p = state.pos;
+  if (!c || !p || c.lat == null) return null;
+  return Math.round(haversine(p.lat, p.lng, c.lat, c.lng));
+}
+function inRange() { const d = distance(); return d !== null && d <= state.cfg.radius; }
+function renderGps() {
+  const p = state.pos, c = state.cfg; if (!p) return;
+  $('gpsCoords').textContent = `${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}  (±${Math.round(p.acc)} ม.)`;
+  if (!c) return;
+  if (c.lat == null) {
+    $('gpsDist').textContent = '–'; $('gpsUnit').textContent = '';
+    setGpsUi('bad', 'ยังไม่ตั้งพิกัดหอผู้ป่วย');
+    $('gpsNote').textContent = 'ผู้ดูแลต้องใส่ LAT/LNG ในชีต "ตั้งค่า" (คัดลอกพิกัดด้านล่างได้)';
+    return;
+  }
+  const d = distance(), ok = d <= c.radius;
+  $('gpsDist').textContent = d.toLocaleString('th-TH');
+  $('gpsUnit').textContent = `ม. จากหอผู้ป่วย (รัศมี ${c.radius} ม.)`;
+  const m = $('gpsMeter');
+  m.style.width = Math.max(4, Math.min(100, (1 - Math.min(d, c.radius*3)/(c.radius*3)) * 100)) + '%';
+  m.style.background = ok ? 'var(--ok)' : 'var(--bad)';
+  setGpsUi(ok ? 'ok' : 'bad', ok ? 'อยู่ในพื้นที่' : 'อยู่นอกพื้นที่');
+  $('gpsNote').textContent = (ok ? 'พร้อมลงเวลา' : 'ต้องอยู่ภายในหอผู้ป่วยจึงจะลงเวลาได้') +
+    ` · ความแม่นยำ ±${Math.round(p.acc)} ม.` + (p.acc > 100 ? ' (สัญญาณอ่อน ลองไปใกล้หน้าต่าง)' : '');
+}
+
+/* ---------- API ---------- */
+async function api(method, payload) {
+  if (!API_URL) return demoApi(method, payload);
+  let res;
+  if (method === 'GET') {
+    res = await fetch(API_URL + '?' + new URLSearchParams(payload), { redirect: 'follow' });
+  } else {
+    res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload), redirect: 'follow' });
+  }
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || 'เกิดข้อผิดพลาด');
+  if (data.serverTime) state.clockSkew = data.serverTime - Date.now();
+  return data;
+}
+
+/* ---------- โหมดทดลอง (ไม่มี API_URL) ---------- */
+function demoApi(method, p) {
+  const shifts = [
+    { code:'M', name:'เช้า', start:'08:00', end:'16:00' },
+    { code:'A', name:'บ่าย', start:'16:00', end:'24:00' },
+    { code:'N', name:'ดึก', start:'00:00', end:'08:00' }];
+  const log = LS.get('micu2_demo_log', []);
+  const save = () => LS.set('micu2_demo_log', log);
+  const rec = (r) => ({ ...r, dateTh: thaiDate(r.date), inTime: hm(r.in), outTime: r.out ? hm(r.out) : '' });
+  const t = Date.now();
+  return new Promise((ok, fail) => setTimeout(() => {
+    try {
+      const act = p.action;
+      if (act === 'config') return ok({ ok:true, ward:'MICU 2(240)', lat:null, lng:null, radius:100, graceMin:0, openBeforeMin:120, shifts,
+        staff:[{id:'0001',name:'ตัวอย่าง พยาบาลหนึ่ง'},{id:'0002',name:'ตัวอย่าง พยาบาลสอง'},{id:'0003',name:'ตัวอย่าง พยาบาลสาม'}] });
+      const mine = log.filter(r => r.staff === p.id);
+      const open = [...mine].reverse().find(r => !r.out && t - r.in < 72e6);
+      if (act === 'status') return ok({ ok:true, open: open ? rec(open) : null, recent: mine.slice(-6).reverse().map(rec) });
+      if (!state.pos) throw new Error('ไม่ได้รับพิกัด GPS');
+      if (act === 'checkin') {
+        const sh = shifts.find(s => s.code === p.shift), w = shiftWindow(sh, t, 120);
+        if (!w) throw new Error(`ขณะนี้ไม่อยู่ในช่วงเวลาลงเวลาเข้าเวร${sh.name} (${sh.start}-${sh.end})`);
+        if (mine.some(r => r.date === w.date && r.shift === sh.name)) throw new Error(`คุณลงเวลาเข้าเวร${sh.name} วันที่ ${thaiDate(w.date)} ไปแล้ว`);
+        const late = Math.floor((t - w.start)/60000);
+        const r = { staff:p.id, date:w.date, shift:sh.name, in:t, inStatus: late > 0 ? `สาย ${late} นาที` : 'ตรงเวลา', inDist: distance() };
+        log.push(r); save(); return ok({ ok:true, message:`ลงเวลาเข้าเวร${sh.name} สำเร็จ`, record: rec(r) });
+      }
+      if (act === 'checkout') {
+        if (!open) throw new Error('ไม่พบการลงเวลาเข้างานที่ยังไม่ได้ลงเวลาออก');
+        const sh = shifts.find(s => s.name === open.shift), end = shiftBounds(sh, open.date).end, early = Math.floor((end - t)/60000);
+        open.out = t; open.outStatus = early > 0 ? `ออกก่อน ${early} นาที` : (-early >= 30 ? `ออกหลังเวร ${-early} นาที` : 'ปกติ');
+        open.hours = Math.round((t - open.in)/36000)/100;
+        save(); return ok({ ok:true, message:`ลงเวลาออกเวร${open.shift} สำเร็จ`, record: rec(open) });
+      }
+      throw new Error('ไม่รู้จักคำสั่ง');
+    } catch (e) { fail(e); }
+  }, 350));
+}
+
+/* ---------- UI ---------- */
+let toastTimer;
+function toast(msg, kind = 'ok') {
+  const el = $('toast'); el.textContent = msg; el.className = `toast ${kind} show`;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), kind === 'bad' ? 6000 : 3500);
+  if (navigator.vibrate) navigator.vibrate(kind === 'ok' ? 60 : [80, 60, 80]);
+}
+function esc(s) { return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function statusPill(text) {
+  if (!text) return '';
+  const k = /สาย|ออกก่อน/.test(text) ? 'warn' : /ยังไม่/.test(text) ? 'bad' : 'ok';
+  return `<span class="pill ${k}">${esc(text)}</span>`;
+}
+function renderStatus(data) {
+  state.open = data.open;
+  const oc = $('openCard');
+  if (data.open) {
+    oc.classList.remove('hidden');
+    $('openText').textContent = `เวร${data.open.shift} · เข้า ${data.open.inTime} น.`;
+    $('openDate').textContent = `วันที่เวร ${data.open.dateTh}`;
+  } else oc.classList.add('hidden');
+  const h = $('hist');
+  if (!data.recent || !data.recent.length) { h.innerHTML = '<li class="muted small">ยังไม่มีประวัติการลงเวลา</li>'; return; }
+  h.innerHTML = data.recent.map(r => `
+    <li>
+      <div class="row between"><b>เวร${esc(r.shift)}</b><span class="small muted">${esc(r.dateTh)}</span></div>
+      <div class="row between t small" style="margin-top:4px">
+        <span>เข้า ${esc(r.inTime)} ${statusPill(r.inStatus)}</span>
+        <span>ออก ${r.outTime ? esc(r.outTime) + ' ' + statusPill(r.outStatus) : '<span class="muted">–</span>'}</span>
+      </div>
+    </li>`).join('');
+}
+function updateButtons() {
+  const staffOk = !!$('staff').value, gpsOk = state.cfg && inRange(), free = !state.busy;
+  $('btnIn').disabled = !(staffOk && gpsOk && free && state.shift && !state.open);
+  $('btnOut').disabled = !(staffOk && gpsOk && free && state.open);
+  const sh = state.cfg && state.cfg.shifts.find(s => s.code === state.shift);
+  const sub = $('btnInSub');
+  if (sub) sub.textContent = state.open ? 'ลงเวลาออกก่อน' : (sh ? `เวร${sh.name}` : 'เลือกเวร');
+}
+async function loadStatus() {
+  const id = $('staff').value;
+  if (!id) { renderStatus({ open:null, recent:[] }); updateButtons(); return; }
+  $('hist').innerHTML = '<li class="muted small"><span class="spin"></span> กำลังโหลด…</li>';
+  try { renderStatus(await api('GET', { action:'status', id })); }
+  catch (e) { $('hist').innerHTML = `<li class="small" style="color:var(--bad)">${esc(e.message)}</li>`; }
+  updateButtons();
+}
+async function punch(action) {
+  if (state.busy) return;
+  const btn = action === 'checkin' ? $('btnIn') : $('btnOut');
+  const label = btn.innerHTML;
+  state.busy = true; updateButtons(); btn.innerHTML = '<span class="spin"></span>';
+  try {
+    const p = state.pos;
+    const r = await api('POST', { action, id: $('staff').value, shift: state.shift,
+      lat: p.lat, lng: p.lng, accuracy: p.acc, ua: navigator.userAgent });
+    const rec = r.record;
+    const extra = action === 'checkin' ? `เวลา ${rec.inTime} น. · ${rec.inStatus}` : `เวลา ${rec.outTime} น. · ${rec.outStatus} · ${rec.hours} ชม.`;
+    toast(`${r.message}\n${extra}`, 'ok');
+    await loadStatus();
+  } catch (e) { toast(e.message || 'เชื่อมต่อไม่สำเร็จ กรุณาลองใหม่', 'bad'); }
+  finally { state.busy = false; btn.innerHTML = label; updateButtons(); }
+}
+
+async function init() {
+  tick(); setInterval(tick, 1000);
+  if (!API_URL) $('demoBanner').classList.remove('hidden');
+  startGps();
+  try {
+    state.cfg = await api('GET', { action:'config' });
+  } catch (e) {
+    $('staff').innerHTML = '<option value="">โหลดข้อมูลไม่สำเร็จ</option>';
+    toast('เชื่อมต่อระบบไม่สำเร็จ: ' + e.message, 'bad'); return;
+  }
+  if (!API_URL && state.pos) { state.cfg.lat = state.pos.lat; state.cfg.lng = state.pos.lng; }
+  $('wardName').textContent = state.cfg.ward || 'MICU 2(240)';
+  document.title = `ลงเวลา ${state.cfg.ward || 'MICU 2(240)'}`;
+  const sel = $('staff'), saved = LS.get('micu2_staff', '');
+  sel.innerHTML = '<option value="">— เลือกชื่อของคุณ —</option>' +
+    state.cfg.staff.map(s => `<option value="${esc(s.id)}">${esc(s.name)}${s.position ? ' · ' + esc(s.position) : ''}</option>`).join('');
+  if (saved && state.cfg.staff.some(s => s.id === saved)) sel.value = saved;
+  sel.onchange = () => { LS.set('micu2_staff', sel.value); loadStatus(); };
+  state.shift = suggestShift();
+  renderShifts(); renderGps(); updateButtons(); loadStatus();
+  setInterval(() => { renderShifts(); updateButtons(); }, 60000);
+}
+
+$('btnIn').onclick = () => punch('checkin');
+$('btnOut').onclick = () => punch('checkout');
+$('gpsRefresh').onclick = startGps;
+$('reload').onclick = loadStatus;
+$('copyCoords').onclick = async () => {
+  if (!state.pos) return toast('ยังไม่ได้รับพิกัด', 'bad');
+  const t = `${state.pos.lat.toFixed(6)},${state.pos.lng.toFixed(6)}`;
+  try { await navigator.clipboard.writeText(t); toast('คัดลอกพิกัดแล้ว: ' + t); } catch (e) { toast(t); }
+};
+document.addEventListener('visibilitychange', () => { if (!document.hidden && state.cfg) { tick(); loadStatus(); } });
+init();
+</script>
+</body>
+</html>
