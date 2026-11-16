@@ -1,5 +1,5 @@
 /**
- * ระบบลงเวลาเข้า-ออกงานพยาบาล หอผู้ป่วย MICU 2(240)
+ * MICU 2 เวลาเข้า-ออกงาน — ระบบลงเวลาพยาบาล หอผู้ป่วย MICU 2(240)
  * Backend: Google Apps Script + Google Sheets
  *
  * วิธีติดตั้งโดยย่อ (ดูรายละเอียดใน micu2/README.md)
@@ -353,7 +353,7 @@ function recordToObj_(r) {
 /* ============================== ติดตั้ง / เมนู ============================== */
 
 function onOpen() {
-  SpreadsheetApp.getUi().createMenu('MICU 2 ลงเวลา')
+  SpreadsheetApp.getUi().createMenu('MICU 2 เวลาเข้า-ออกงาน')
     .addItem('สรุปรายเดือน…', 'menuMonthlySummary')
     .addItem('รายงานรายวัน…', 'menuDailyReport')
     .addSeparator()

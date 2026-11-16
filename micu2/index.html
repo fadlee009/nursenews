@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ลงเวลา MICU 2(240)</title>
+<title>MICU 2 เวลาเข้า-ออกงาน</title>
+<meta name="apple-mobile-web-app-title" content="MICU 2 เข้า-ออกงาน">
+<meta name="application-name" content="MICU 2 เวลาเข้า-ออกงาน">
 <meta name="theme-color" content="#0f6e6e">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -121,8 +123,8 @@
 <body>
 <header class="top">
   <div class="inner">
-    <div class="ward" id="wardName">MICU 2(240)</div>
-    <h1>ลงเวลาปฏิบัติงานพยาบาล</h1>
+    <div class="ward" id="wardName">หอผู้ป่วย MICU 2(240)</div>
+    <h1>MICU 2 เวลาเข้า-ออกงาน</h1>
   </div>
 </header>
 
@@ -437,8 +439,7 @@ async function init() {
     toast('เชื่อมต่อระบบไม่สำเร็จ: ' + e.message, 'bad'); return;
   }
   if (!API_URL && state.pos) { state.cfg.lat = state.pos.lat; state.cfg.lng = state.pos.lng; }
-  $('wardName').textContent = state.cfg.ward || 'MICU 2(240)';
-  document.title = `ลงเวลา ${state.cfg.ward || 'MICU 2(240)'}`;
+  $('wardName').textContent = 'หอผู้ป่วย ' + (state.cfg.ward || 'MICU 2(240)');
   const sel = $('staff'), saved = LS.get('micu2_staff', '');
   sel.innerHTML = '<option value="">— เลือกชื่อของคุณ —</option>' +
     state.cfg.staff.map(s => `<option value="${esc(s.id)}">${esc(s.name)}${s.position ? ' · ' + esc(s.position) : ''}</option>`).join('');
