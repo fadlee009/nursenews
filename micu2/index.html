@@ -136,7 +136,7 @@
 
   <div class="banner hidden" id="demoBanner">
     โหมดทดลอง: ยังไม่ได้เชื่อม Google Sheets ข้อมูลจะเก็บในเครื่องนี้เท่านั้น
-    (ใส่ API_URL ใน index.html ตามคู่มือ README)
+    (เปิดลิงก์ที่มี ?api=URL /exec หรือใส่ API_URL_FIXED ใน index.html)
   </div>
 
   <section class="card pad">
@@ -198,7 +198,20 @@
  * ตั้งค่า: วาง URL เว็บแอป Apps Script (ลงท้าย /exec) ระหว่างเครื่องหมาย ''
  * ถ้าเว้นว่างไว้ แอปจะทำงานใน "โหมดทดลอง" เก็บข้อมูลในเครื่องนี้เท่านั้น
  * ===================================================================== */
-const API_URL = '';
+const API_URL_FIXED = '';
+
+/* เชื่อมต่อผ่านลิงก์ได้: เปิด index.html?api=<URL /exec> ครั้งเดียว เครื่องจะจำไว้ */
+const API_URL = (() => {
+  const ok = (u) => /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(u || '');
+  if (ok(API_URL_FIXED)) return API_URL_FIXED;
+  try {
+    const q = new URLSearchParams(location.search).get('api');
+    if (q === 'reset') { localStorage.removeItem('micu2_api'); return ''; }
+    if (ok(q)) { localStorage.setItem('micu2_api', q); return q; }
+    const saved = localStorage.getItem('micu2_api');
+    return ok(saved) ? saved : '';
+  } catch (e) { return ''; }
+})();
 
 const TZ_OFF = 7 * 3600 * 1000;
 const LS = {
