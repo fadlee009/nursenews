@@ -356,6 +356,7 @@ function onOpen() {
   SpreadsheetApp.getUi().createMenu('MICU 2 เวลาเข้า-ออกงาน')
     .addItem('สรุปรายเดือน…', 'menuMonthlySummary')
     .addItem('รายงานรายวัน…', 'menuDailyReport')
+    .addItem('📥 ส่งออก Excel รายเดือน…', 'menuExportExcel')
     .addSeparator()
     .addItem('ติดตั้ง/ซ่อมแซมชีต (setup)', 'setup')
     .addToUi();
@@ -418,17 +419,42 @@ function styleHeader_(sh, cols) {
 /* ============================== รายงาน ============================== */
 
 function menuMonthlySummary() {
+  var month = askMonth_('สรุปรายเดือน');
+  if (month) buildMonthlySummary(month);
+}
+
+/** ถามเดือน รับได้ทั้ง 2026-11, 11/2569, 11/2026 (ค.ศ. หรือ พ.ศ.) คืนค่า yyyy-MM หรือ null */
+function askMonth_(title) {
   var ui = SpreadsheetApp.getUi();
-  var def = bkkDateStr_(Date.now()).slice(0, 7);
-  var res = ui.prompt('สรุปรายเดือน', 'ระบุเดือน (ค.ศ.) รูปแบบ yyyy-MM เช่น ' + def, ui.ButtonSet.OK_CANCEL);
-  if (res.getSelectedButton() !== ui.Button.OK) return;
-  var month = res.getResponseText().trim() || def;
-  if (!/^\d{4}-\d{2}$/.test(month)) { ui.alert('รูปแบบเดือนไม่ถูกต้อง'); return; }
-  buildMonthlySummary(month);
+  var cur = bkkDateStr_(Date.now()).slice(0, 7);
+  var curTh = Number(cur.slice(5)) + '/' + (Number(cur.slice(0, 4)) + 543);
+  var res = ui.prompt(title, 'ระบุเดือน/ปี เช่น ' + curTh + ' (พ.ศ.) หรือ ' + cur +
+    '\nเว้นว่างไว้ = เดือนปัจจุบัน', ui.ButtonSet.OK_CANCEL);
+  if (res.getSelectedButton() !== ui.Button.OK) return null;
+  var t = res.getResponseText().trim();
+  if (!t) return cur;
+  var m = t.match(/^(\d{4})[-\/.](\d{1,2})$/), y, mo;
+  if (m) { y = +m[1]; mo = +m[2]; }
+  else if ((m = t.match(/^(\d{1,2})[-\/.](\d{4})$/))) { y = +m[2]; mo = +m[1]; }
+  else { ui.alert('รูปแบบเดือนไม่ถูกต้อง ตัวอย่าง: ' + curTh); return null; }
+  if (y > 2400) y -= 543;
+  if (mo < 1 || mo > 12) { ui.alert('เดือนต้องอยู่ระหว่าง 1–12'); return null; }
+  return y + '-' + pad_(mo);
+}
+
+function thaiMonth_(month) {
+  var names = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  return names[Number(month.slice(5)) - 1] + ' ' + (Number(month.slice(0, 4)) + 543);
 }
 
 /** สร้างชีต "สรุป yyyy-MM": จำนวนเวร มาสาย ออกก่อน ไม่ลงเวลาออก ชั่วโมงรวม ต่อคน */
 function buildMonthlySummary(month) {
+  var m = computeMonthly_(month);
+  writeReport_('สรุป ' + month, m.title, m.header, m.summary, [1]);
+}
+
+/** คำนวณสรุปรายเดือน คืนค่า { title, header, summary, logRows } */
+function computeMonthly_(month) {
   var s = getSettings_();
   var shifts = getShifts_(s);
   var rows = readRecentLog_(100000).map(function (x) { return x.row; })
@@ -457,7 +483,68 @@ function buildMonthlySummary(month) {
     return [o.id, o.name, o['เช้า'] || 0, o['บ่าย'] || 0, o['ดึก'] || 0, o.total,
       o.late, o.lateMin, o.early, o.earlyMin, o.noOut, Math.round(o.hours * 100) / 100];
   });
-  writeReport_('สรุป ' + month, 'สรุปการลงเวลา ' + (s.WARD_NAME || '') + ' เดือน ' + month, header, out);
+  return {
+    title: 'สรุปการลงเวลา ' + (s.WARD_NAME || '') + ' เดือน' + thaiMonth_(month),
+    header: header, summary: out, logRows: rows
+  };
+}
+
+/* ============================== ส่งออก Excel ============================== */
+
+function menuExportExcel() {
+  var month = askMonth_('ส่งออก Excel รายเดือน');
+  if (month) exportMonthlyExcel(month);
+}
+
+/**
+ * สร้างไฟล์ Google Sheet แยก (ชีต "สรุปรายเดือน" + "บันทึกเวลา") แล้วแสดงปุ่มดาวน์โหลดเป็น .xlsx
+ * ไม่รวมพิกัดและข้อมูลอุปกรณ์ เพื่อลดการเปิดเผยข้อมูลส่วนบุคคล
+ */
+function exportMonthlyExcel(month) {
+  var m = computeMonthly_(month);
+  var order = { 'ดึก': 0, 'เช้า': 1, 'บ่าย': 2 };
+  var logs = m.logRows.slice().sort(function (a, b) {
+    return ds_(a[C.DATE]).localeCompare(ds_(b[C.DATE])) || (order[a[C.SHIFT]] - order[b[C.SHIFT]]) ||
+      (toMs_(a[C.IN]) - toMs_(b[C.IN]));
+  }).map(function (r) {
+    var p = ds_(r[C.DATE]).split('-');
+    // เที่ยงวันเวลาไทย เพื่อให้วันที่ไม่เลื่อนไม่ว่าโซนเวลาของสคริปต์เป็นอะไร
+    return [new Date(Date.UTC(+p[0], +p[1] - 1, +p[2], 5)), r[C.SHIFT], String(r[C.STAFF_ID]), r[C.NAME],
+      r[C.IN] ? new Date(toMs_(r[C.IN])) : '', r[C.IN_STATUS], Number(r[C.LATE_MIN]) || 0,
+      r[C.OUT] ? new Date(toMs_(r[C.OUT])) : '', r[C.OUT_STATUS] || 'ไม่ได้ลงเวลาออก', Number(r[C.EARLY_MIN]) || 0,
+      r[C.HOURS] === '' ? '' : Number(r[C.HOURS]), r[C.IN_DIST], r[C.OUT_DIST]];
+  });
+  var logHeader = ['วันที่เวร', 'เวร', 'รหัสพนักงาน', 'ชื่อ-สกุล', 'เวลาเข้า', 'สถานะเข้า', 'นาทีสาย',
+    'เวลาออก', 'สถานะออก', 'นาทีออกก่อน', 'ชั่วโมงทำงาน', 'ระยะห่างตอนเข้า (ม.)', 'ระยะห่างตอนออก (ม.)'];
+
+  var name = 'MICU 2 เวลาเข้า-ออกงาน ' + month;
+  var out = SpreadsheetApp.create(name);
+  out.setSpreadsheetTimeZone(TZ);
+  var sum = out.getSheets()[0];
+  sum.setName('สรุปรายเดือน');
+  writeTable_(sum, m.title, m.header, m.summary, [1]);
+  var lg = out.insertSheet('บันทึกเวลา');
+  writeTable_(lg, 'บันทึกเวลารายเวร เดือน' + thaiMonth_(month) + ' (' + logs.length + ' รายการ)', logHeader, logs, [3]);
+  if (logs.length) {
+    lg.getRange(4, 1, logs.length, 1).setNumberFormat('dd/mm/yyyy');
+    lg.getRange(4, 5, logs.length, 1).setNumberFormat('hh:mm');
+    lg.getRange(4, 8, logs.length, 1).setNumberFormat('hh:mm');
+    lg.autoResizeColumns(1, logHeader.length);
+  }
+  SpreadsheetApp.flush();
+
+  var xlsx = 'https://docs.google.com/spreadsheets/d/' + out.getId() + '/export?format=xlsx';
+  var html = HtmlService.createHtmlOutput(
+    '<div style="font-family:sans-serif;text-align:center;padding:8px">' +
+    '<div style="font-size:15px;margin-bottom:6px">สร้างไฟล์เดือน<b>' + thaiMonth_(month) + '</b> เรียบร้อย</div>' +
+    '<div style="color:#64748b;font-size:13px;margin-bottom:16px">สรุป ' + m.summary.length + ' คน · บันทึก ' + logs.length + ' รายการ</div>' +
+    '<a href="' + xlsx + '" target="_blank" style="display:block;background:#0d9488;color:#fff;text-decoration:none;' +
+    'padding:14px;border-radius:10px;font-size:16px;font-weight:bold">📥 ดาวน์โหลดไฟล์ Excel</a>' +
+    '<a href="' + out.getUrl() + '" target="_blank" style="display:block;margin-top:12px;color:#2563eb;font-size:13px">' +
+    'หรือเปิดดูใน Google Sheets</a>' +
+    '<div style="color:#94a3b8;font-size:12px;margin-top:14px">สำเนาเก็บไว้ใน Google Drive ชื่อ "' + name + '"</div></div>'
+  ).setWidth(380).setHeight(270);
+  SpreadsheetApp.getUi().showModalDialog(html, 'ส่งออก Excel');
 }
 
 function blankSum_(id, name) {
@@ -488,17 +575,23 @@ function buildDailyReport(date) {
   writeReport_('รายวัน ' + date, 'รายงานการลงเวลาวันที่ ' + thaiDate_(date), header, rows);
 }
 
-function writeReport_(name, title, header, rows) {
+function writeReport_(name, title, header, rows, textCols) {
   var ss = ss_();
   var sh = ss.getSheetByName(name) || ss.insertSheet(name);
+  writeTable_(sh, title, header, rows, textCols);
+  ss.setActiveSheet(sh);
+}
+
+/** textCols = หมายเลขคอลัมน์ (เริ่ม 1) ที่ต้องเก็บเป็นข้อความ เช่น รหัส 0001 */
+function writeTable_(sh, title, header, rows, textCols) {
   sh.clear();
   sh.getRange(1, 1).setValue(title).setFontWeight('bold').setFontSize(13);
   sh.getRange(2, 1).setValue('สร้างเมื่อ ' + Utilities.formatDate(new Date(), TZ, 'dd/MM/yyyy HH:mm'));
   sh.getRange(3, 1, 1, header.length).setValues([header])
     .setFontWeight('bold').setBackground('#0f6e6e').setFontColor('#ffffff');
+  (textCols || []).forEach(function (c) { if (rows.length) sh.getRange(4, c, rows.length, 1).setNumberFormat('@'); });
   if (rows.length) sh.getRange(4, 1, rows.length, header.length).setValues(rows);
   else sh.getRange(4, 1).setValue('ไม่มีข้อมูล');
   sh.setFrozenRows(3);
   sh.autoResizeColumns(1, header.length);
-  ss.setActiveSheet(sh);
 }
