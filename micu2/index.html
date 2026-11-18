@@ -153,6 +153,10 @@
   .punch:active:not([disabled]) { transform: scale(.95); }
   .punch[disabled] { filter: grayscale(.9); opacity: .45; cursor: not-allowed; box-shadow: none; }
   .hint { font-size: 14px; color: var(--muted); min-height: 21px; }
+  .hint.warn { display: inline-flex; align-items: center; gap: 8px; color: var(--warn); background: var(--warn-soft);
+    padding: 8px 14px; border-radius: 12px; font-weight: 500; text-align: left; line-height: 1.4; }
+  .hint.warn::before { content: "⚠️"; }
+  .hint.ready { color: var(--ok); font-weight: 600; }
 
   .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
   .stat { background: var(--track); border-radius: 16px; padding: 10px 6px; }
@@ -463,7 +467,7 @@ function renderGps() {
   if (!c) return;
   if (c.lat == null) {
     $('gpsDist').textContent = '–'; $('gpsUnit').textContent = '';
-    setGpsUi('bad', 'ยังไม่ตั้งพิกัดหอผู้ป่วย');
+    setGpsUi('bad', 'ยังไม่ตั้งพิกัด');
     $('gpsNote').textContent = 'ผู้ดูแลต้องใส่ LAT/LNG ในชีต "ตั้งค่า" (คัดลอกพิกัดด้านล่างได้)';
     return;
   }
@@ -587,21 +591,24 @@ function updateButtons() {
   const zone = $('punchZone');
   zone.classList.toggle('live', ready);
   zone.style.setProperty('--ring', state.open ? 'var(--out)' : 'var(--brand)');
-  let hint = '';
-  if (!state.cfg) hint = 'กำลังเชื่อมต่อระบบ…';
-  else if (!staffOk) hint = 'แตะชื่อด้านบนเพื่อเลือกชื่อของคุณ';
-  else if (!state.pos) hint = 'กำลังหาตำแหน่ง GPS…';
-  else if (state.cfg.lat == null) hint = 'ยังไม่ได้ตั้งพิกัดหอผู้ป่วย';
-  else if (!gpsOk) hint = 'คุณอยู่นอกพื้นที่หอผู้ป่วย';
+  let hint = '', warn = true;
+  if (state.cfgError) hint = 'เชื่อมต่อระบบไม่สำเร็จ — ตรวจสัญญาณอินเทอร์เน็ต แล้วดึงหน้าจอลงเพื่อโหลดใหม่';
+  else if (!state.cfg) { hint = 'กำลังเชื่อมต่อระบบ…'; warn = false; }
+  else if (!state.cfg.staff.length) hint = 'ยังไม่มีรายชื่อพยาบาลในระบบ — ผู้ดูแลต้องเพิ่มชื่อในชีต "รายชื่อพยาบาล"';
+  else if (state.cfg.lat == null) hint = 'ยังไม่ได้ตั้งพิกัดหอผู้ป่วย — ผู้ดูแลต้องใส่ LAT/LNG ในชีต "ตั้งค่า"';
+  else if (!staffOk) hint = 'แตะชื่อด้านบนเพื่อเลือกชื่อของคุณก่อน';
+  else if (!state.pos) hint = 'กำลังหาตำแหน่ง GPS… (ต้องกด "อนุญาต" ให้ใช้ตำแหน่ง)';
+  else if (!gpsOk) hint = `คุณอยู่นอกพื้นที่หอผู้ป่วย (ห่าง ${distance().toLocaleString('th-TH')} ม.)`;
   else if (!state.open && !state.shift) hint = 'เลือกเวรก่อนลงเวลาเข้า';
-  else hint = state.open ? 'พร้อมลงเวลาออก' : 'พร้อมลงเวลาเข้า';
+  else { hint = state.open ? '✅ พร้อมลงเวลาออก — แตะปุ่มด้านบน' : '✅ พร้อมลงเวลาเข้า — แตะปุ่มด้านบน'; warn = false; }
+  $('hint').className = 'hint' + (warn ? ' warn' : (ready ? ' ready' : ''));
   $('hint').textContent = hint;
 }
 function renderWho() {
   const c = state.cfg, id = $('staff').value;
   const st = c && c.staff.find(s => s.id === id);
   const name = st ? st.name.replace(/^(นาง(สาว)?|นาย|น\.ส\.)\s*/, '') : '';
-  $('whoName').textContent = st ? st.name : 'แตะเพื่อเลือกชื่อของคุณ';
+  $('whoName').textContent = st ? st.name : (c && !c.staff.length ? 'ยังไม่มีรายชื่อในระบบ' : 'แตะเพื่อเลือกชื่อของคุณ');
   $('avatar').textContent = name ? name.match(/[ก-ฮA-Za-z]/)?.[0] || name[0] : '?';
 }
 function showSheet(kind, title, time, statusText, sub) {
@@ -647,6 +654,7 @@ async function init() {
   try {
     state.cfg = await api('GET', { action:'config' });
   } catch (e) {
+    state.cfgError = true; updateButtons();
     $('staff').innerHTML = '<option value="">โหลดข้อมูลไม่สำเร็จ</option>';
     toast('เชื่อมต่อระบบไม่สำเร็จ: ' + e.message, 'bad'); return;
   }
