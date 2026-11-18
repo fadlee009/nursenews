@@ -6,192 +6,337 @@
 <title>MICU 2 เวลาเข้า-ออกงาน</title>
 <meta name="apple-mobile-web-app-title" content="MICU 2 เข้า-ออกงาน">
 <meta name="application-name" content="MICU 2 เวลาเข้า-ออกงาน">
-<meta name="theme-color" content="#0f6e6e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0b6b72">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%230d9488'/%3E%3Cstop offset='1' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Ccircle cx='32' cy='32' r='17' fill='none' stroke='white' stroke-width='5'/%3E%3Cpath d='M32 22v11l7 5' fill='none' stroke='white' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%230d9488'/%3E%3Cstop offset='1' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' fill='url(%23g)'/%3E%3Ccircle cx='32' cy='32' r='17' fill='none' stroke='white' stroke-width='5'/%3E%3Cpath d='M32 22v11l7 5' fill='none' stroke='white' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Prompt:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-  /* ===== ตั้งค่า: วาง URL เว็บแอปของ Apps Script ไว้ในสคริปต์ด้านล่าง (API_URL) ===== */
   :root {
-    --bg: #f3f6f6; --card: #ffffff; --ink: #14302f; --muted: #5d7473; --line: #dde6e5;
-    --brand: #0f6e6e; --brand-ink: #ffffff; --brand-soft: #e2f1f0;
-    --ok: #1d7a46; --ok-soft: #e3f3e9; --warn: #9a5b00; --warn-soft: #fdf0dc;
-    --bad: #b3261e; --bad-soft: #fbe5e3; --out: #3d4f8a; --out-soft: #e7eaf6;
-    --shadow: 0 1px 2px rgba(10,40,40,.06), 0 4px 16px rgba(10,40,40,.06);
+    --bg: #f2f5f8; --card: #ffffff; --ink: #0f1f2a; --muted: #64748b; --line: #e6ebf1; --track: #eef2f6;
+    --brand: #0d9488; --brand-2: #2563eb; --brand-soft: #e6f6f4;
+    --hero-1: #0b6b72; --hero-2: #1e4fd8;
+    --ok: #16a34a; --ok-soft: #e8f7ee; --warn: #c2410c; --warn-soft: #fff1e6;
+    --bad: #dc2626; --bad-soft: #fdecec; --out: #f97316; --out-2: #e11d48;
+    --shadow-sm: 0 1px 2px rgba(15,31,42,.05);
+    --shadow: 0 1px 2px rgba(15,31,42,.04), 0 10px 30px -12px rgba(15,31,42,.14);
+    --radius: 22px;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #0e1717; --card: #152222; --ink: #e4efee; --muted: #93abaa; --line: #24393a;
-      --brand: #3fb4ad; --brand-ink: #062020; --brand-soft: #173a39;
-      --ok: #5fd08f; --ok-soft: #15301f; --warn: #f0b356; --warn-soft: #33270f;
-      --bad: #ff8a80; --bad-soft: #3a1714; --out: #9fb0ef; --out-soft: #1c2340;
-      --shadow: none;
+      --bg: #0a0f14; --card: #121a22; --ink: #e8eef4; --muted: #8fa1b3; --line: #1f2a35; --track: #1a2430;
+      --brand: #2dd4bf; --brand-2: #60a5fa; --brand-soft: #0f2e2c;
+      --hero-1: #0a4f55; --hero-2: #1a3a9c;
+      --ok: #4ade80; --ok-soft: #10261a; --warn: #fb923c; --warn-soft: #2b1a0d;
+      --bad: #f87171; --bad-soft: #2d1414; --out: #fb923c; --out-2: #f43f5e;
+      --shadow-sm: none; --shadow: 0 0 0 1px var(--line);
     }
   }
   :root[data-theme="dark"] {
-    --bg: #0e1717; --card: #152222; --ink: #e4efee; --muted: #93abaa; --line: #24393a;
-    --brand: #3fb4ad; --brand-ink: #062020; --brand-soft: #173a39;
-    --ok: #5fd08f; --ok-soft: #15301f; --warn: #f0b356; --warn-soft: #33270f;
-    --bad: #ff8a80; --bad-soft: #3a1714; --out: #9fb0ef; --out-soft: #1c2340;
-    --shadow: none;
+    --bg: #0a0f14; --card: #121a22; --ink: #e8eef4; --muted: #8fa1b3; --line: #1f2a35; --track: #1a2430;
+    --brand: #2dd4bf; --brand-2: #60a5fa; --brand-soft: #0f2e2c;
+    --hero-1: #0a4f55; --hero-2: #1a3a9c;
+    --ok: #4ade80; --ok-soft: #10261a; --warn: #fb923c; --warn-soft: #2b1a0d;
+    --bad: #f87171; --bad-soft: #2d1414; --out: #fb923c; --out-2: #f43f5e;
+    --shadow-sm: none; --shadow: 0 0 0 1px var(--line);
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body {
     background: var(--bg); color: var(--ink);
-    font-family: "Sarabun", "Noto Sans Thai", system-ui, sans-serif; font-size: 16px; line-height: 1.5;
-    -webkit-tap-highlight-color: transparent;
+    font-family: "IBM Plex Sans Thai", "Noto Sans Thai", system-ui, sans-serif; font-size: 16px; line-height: 1.5;
+    -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 480px; margin: 0 auto; padding: 0 16px calc(32px + env(safe-area-inset-bottom)); }
-  header.top {
-    background: var(--brand); color: var(--brand-ink);
-    padding: calc(14px + env(safe-area-inset-top)) 16px 64px;
+  .num, .clock, h1, .title { font-family: "Prompt", "IBM Plex Sans Thai", system-ui, sans-serif; }
+  .num { font-variant-numeric: tabular-nums; }
+  svg.i { width: 20px; height: 20px; flex: none; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative; overflow: hidden; color: #fff;
+    background: radial-gradient(120% 80% at 100% 0%, rgba(255,255,255,.16), transparent 60%),
+                linear-gradient(135deg, var(--hero-1), var(--hero-2));
+    padding: calc(14px + env(safe-area-inset-top)) 16px 84px;
+    border-radius: 0 0 32px 32px;
   }
-  header.top .inner { max-width: 480px; margin: 0 auto; }
-  .ward { font-size: 14px; opacity: .85; font-weight: 500; letter-spacing: .02em; }
-  h1 { margin: 2px 0 0; font-size: 20px; font-weight: 700; }
-  .clock-card { margin-top: -48px; text-align: center; padding: 18px 16px 16px; }
-  .clock { font-size: 52px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.05; letter-spacing: .01em; }
-  .clock small { font-size: 22px; color: var(--muted); font-weight: 600; }
-  .date { color: var(--muted); margin-top: 4px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); margin-bottom: 12px; }
-  .pad { padding: 16px; }
-  label.lbl { display: block; font-size: 14px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
-  select, input[type=search] {
-    width: 100%; font: inherit; font-size: 17px; color: var(--ink); background: var(--bg);
-    border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; min-height: 48px;
-  }
-  select:focus, input:focus, button:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 40%, transparent); outline-offset: 1px; }
+  .hero::after { content: ""; position: absolute; width: 260px; height: 260px; right: -90px; bottom: -120px;
+    border-radius: 50%; background: rgba(255,255,255,.07); }
+  .hero .inner { max-width: 480px; margin: 0 auto; position: relative; z-index: 1; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .logo { width: 36px; height: 36px; border-radius: 11px; background: rgba(255,255,255,.18); display: grid; place-items: center;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.25); }
+  .logo svg.i { width: 20px; height: 20px; }
+  h1 { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.2; white-space: nowrap; }
+  .ward { font-size: 12px; opacity: .8; }
+  .glass { background: rgba(255,255,255,.16); box-shadow: inset 0 0 0 1px rgba(255,255,255,.22);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .hero .pill, .hero .pill.ok, .hero .pill.warn, .hero .pill.bad { color: #fff; background: rgba(255,255,255,.16); box-shadow: inset 0 0 0 1px rgba(255,255,255,.22); white-space: nowrap; }
+  .hero .pill.ok .dot { background: #4ade80; box-shadow: 0 0 0 3px rgba(74,222,128,.3); }
+  .hero .pill.warn .dot { background: #fbbf24; animation: blink 1.2s infinite; }
+  .hero .pill.bad .dot { background: #fca5a5; }
+  @keyframes blink { 50% { opacity: .3; } }
+
+  .who { position: relative; display: flex; align-items: center; gap: 12px; margin-top: 18px; padding: 10px 14px 10px 10px; border-radius: 18px; }
+  .avatar { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; font-family: "Prompt"; font-weight: 600; font-size: 19px;
+    background: linear-gradient(135deg, #ffffff, #dbeafe); color: var(--hero-2); flex: none; }
+  .who .meta { flex: 1; min-width: 0; }
+  .greet { font-size: 13px; opacity: .85; }
+  .who-name { font-family: "Prompt"; font-weight: 600; font-size: 18px; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .who select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font-size: 16px; }
+  .who:focus-within { box-shadow: inset 0 0 0 2px rgba(255,255,255,.7); }
+  .chev { opacity: .85; }
+
+  .time-wrap { text-align: center; margin-top: 22px; }
+  .clock { font-size: 64px; font-weight: 600; line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .clock small { font-size: 24px; opacity: .65; font-weight: 500; margin-left: 2px; }
+  .date { margin-top: 8px; opacity: .85; font-size: 15px; }
+
+  /* ---------- Layout ---------- */
+  .wrap { max-width: 480px; margin: -64px auto 0; padding: 0 16px calc(28px + env(safe-area-inset-bottom)); position: relative; z-index: 2; }
+  .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 14px; }
+  .pad { padding: 18px; }
   .row { display: flex; align-items: center; gap: 12px; }
   .between { justify-content: space-between; }
   .muted { color: var(--muted); }
   .small { font-size: 14px; }
-  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 14px; font-weight: 600; }
+  .sec-title { font-family: "Prompt"; font-size: 16px; font-weight: 600; margin: 0; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: 999px; font-size: 13px; font-weight: 600; }
   .pill.ok { background: var(--ok-soft); color: var(--ok); }
   .pill.warn { background: var(--warn-soft); color: var(--warn); }
   .pill.bad { background: var(--bad-soft); color: var(--bad); }
   .pill.info { background: var(--brand-soft); color: var(--brand); }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
-  .gps-dist { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
-  .meter { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 10px 0 6px; }
-  .meter > i { display: block; height: 100%; width: 0; background: var(--ok); border-radius: 99px; transition: width .4s, background .4s; }
-  .linkbtn { background: none; border: 0; color: var(--brand); font: inherit; font-weight: 600; padding: 8px 4px; cursor: pointer; min-height: 40px; }
-  .shifts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .shift {
-    border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 12px;
-    padding: 10px 4px; font: inherit; cursor: pointer; min-height: 64px; text-align: center;
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex: none; }
+  .linkbtn { background: none; border: 0; color: var(--brand); font: inherit; font-size: 14px; font-weight: 600; padding: 8px 6px; cursor: pointer; min-height: 40px;
+    display: inline-flex; align-items: center; gap: 6px; border-radius: 10px; }
+  .linkbtn:active { background: var(--brand-soft); }
+  button:focus-visible, select:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 45%, transparent); outline-offset: 2px; }
+
+  .banner { display: flex; gap: 10px; background: var(--warn-soft); color: var(--warn); border-radius: 16px; padding: 12px 14px; font-size: 13.5px; margin-bottom: 14px; box-shadow: var(--shadow-sm); }
+
+  /* ---------- Punch card ---------- */
+  .punch-card { padding: 16px 18px 20px; text-align: center; }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; background: var(--track); border-radius: 16px; }
+  .shift { position: relative; border: 0; background: transparent; color: var(--muted); border-radius: 12px; padding: 8px 4px 7px;
+    font: inherit; cursor: pointer; min-height: 56px; transition: background .2s, color .2s, box-shadow .2s; }
+  .shift b { display: block; font-family: "Prompt"; font-size: 16px; font-weight: 600; line-height: 1.3; }
+  .shift span { font-size: 12px; font-variant-numeric: tabular-nums; }
+  .shift[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgba(15,31,42,.12); }
+  .shift .now { position: absolute; top: 6px; right: 8px; width: 7px; height: 7px; border-radius: 50%; font-size: 0; }
+  .shift .now:not(:empty) { background: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 25%, transparent); }
+
+  .open-chip { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; padding: 6px 12px; border-radius: 999px;
+    background: var(--brand-soft); color: var(--brand); font-size: 14px; font-weight: 600; }
+  .open-chip .dot { animation: blink 1.6s infinite; }
+
+  .punch-zone { position: relative; width: 196px; height: 196px; margin: 22px auto 10px; display: grid; place-items: center; }
+  .punch-zone::before, .punch-zone::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--ring, var(--brand)); opacity: .12; }
+  .punch-zone::after { inset: 14px; opacity: .14; }
+  .punch-zone.live::before { animation: pulse 2.2s ease-out infinite; }
+  @keyframes pulse { 0% { transform: scale(.88); opacity: .28; } 100% { transform: scale(1.08); opacity: 0; } }
+  .punch {
+    position: relative; z-index: 1; width: 150px; height: 150px; border-radius: 50%; border: 0; cursor: pointer; color: #fff;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font: inherit;
+    background: linear-gradient(145deg, #0d9488, #2563eb);
+    box-shadow: 0 14px 30px -10px rgba(37,99,235,.6), inset 0 -4px 10px rgba(0,0,0,.12), inset 0 2px 6px rgba(255,255,255,.25);
+    transition: transform .12s, filter .2s, opacity .2s;
   }
-  .shift b { display: block; font-size: 18px; }
-  .shift span { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .shift[aria-pressed="true"] { border-color: var(--brand); background: var(--brand-soft); box-shadow: inset 0 0 0 1px var(--brand); }
-  .shift .now { display: block; font-size: 11px; color: var(--brand); font-weight: 700; height: 14px; }
-  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .big {
-    border: 0; border-radius: 16px; font: inherit; font-size: 19px; font-weight: 700; min-height: 72px;
-    cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-    transition: transform .08s, opacity .2s;
-  }
-  .big small { font-size: 13px; font-weight: 500; opacity: .85; }
-  .big:active { transform: scale(.98); }
-  .big.in { background: var(--brand); color: var(--brand-ink); }
-  .big.out { background: var(--out); color: #fff; }
-  :root[data-theme="dark"] .big.out { color: #0d1430; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .big.out { color: #0d1430; } }
-  .big[disabled] { opacity: .38; cursor: not-allowed; }
-  .status-open { border-left: 4px solid var(--brand); }
-  .hist { list-style: none; margin: 0; padding: 0; }
-  .hist li { padding: 12px 0; border-top: 1px solid var(--line); }
+  .punch.out { background: linear-gradient(145deg, #ea580c, #e11d48);
+    box-shadow: 0 14px 30px -10px rgba(225,29,72,.55), inset 0 -4px 10px rgba(0,0,0,.12), inset 0 2px 6px rgba(255,255,255,.25); }
+  .punch svg.i { width: 34px; height: 34px; stroke-width: 2.2; }
+  .punch .lbl { font-family: "Prompt"; font-size: 19px; font-weight: 600; line-height: 1.2; }
+  .punch small { font-size: 12.5px; opacity: .9; }
+  .punch:active:not([disabled]) { transform: scale(.95); }
+  .punch[disabled] { filter: grayscale(.9); opacity: .45; cursor: not-allowed; box-shadow: none; }
+  .hint { font-size: 14px; color: var(--muted); min-height: 21px; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
+  .stat { background: var(--track); border-radius: 16px; padding: 10px 6px; }
+  .stat .k { font-size: 12px; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 4px; }
+  .stat .k svg.i { width: 14px; height: 14px; }
+  .stat .v { font-family: "Prompt"; font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 2px; }
+
+  /* ---------- Location ---------- */
+  .loc-ic { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: var(--brand-soft); color: var(--brand); flex: none; }
+  .gps-dist { font-family: "Prompt"; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .meter { height: 6px; background: var(--track); border-radius: 99px; overflow: hidden; margin: 14px 0 8px; }
+  .meter > i { display: block; height: 100%; width: 0; background: var(--ok); border-radius: 99px; transition: width .5s, background .4s; }
+  details summary { cursor: pointer; list-style: none; padding: 4px 0; }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before { content: "›"; display: inline-block; margin-right: 6px; transition: transform .2s; }
+  details[open] summary::before { transform: rotate(90deg); }
+  .coords { font-family: ui-monospace, Menlo, monospace; font-size: 13px; word-break: break-all; background: var(--track); padding: 8px 10px; border-radius: 10px; margin-top: 6px; }
+
+  /* ---------- History ---------- */
+  .hist { list-style: none; margin: 8px 0 0; padding: 0; }
+  .hist li { display: flex; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
   .hist li:first-child { border-top: 0; }
-  .hist .t { font-variant-numeric: tabular-nums; }
-  .banner { background: var(--warn-soft); color: var(--warn); border-radius: 12px; padding: 10px 14px; font-size: 14px; margin-bottom: 12px; }
+  .h-ic { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; flex: none; font-family: "Prompt"; font-weight: 600; font-size: 15px; }
+  .h-ic.M { background: #fef3c7; color: #b45309; } .h-ic.A { background: #e0e7ff; color: #4338ca; } .h-ic.N { background: #ede9fe; color: #6d28d9; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .h-ic.M { background: #2d230c; color: #fbbf24; }
+    :root:not([data-theme="light"]) .h-ic.A { background: #1b2047; color: #a5b4fc; } :root:not([data-theme="light"]) .h-ic.N { background: #261c45; color: #c4b5fd; } }
+  :root[data-theme="dark"] .h-ic.M { background: #2d230c; color: #fbbf24; } :root[data-theme="dark"] .h-ic.A { background: #1b2047; color: #a5b4fc; } :root[data-theme="dark"] .h-ic.N { background: #261c45; color: #c4b5fd; }
+  .h-body { flex: 1; min-width: 0; }
+  .h-times { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 4px; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .h-times .pill { font-size: 12px; padding: 2px 8px; margin-left: 4px; }
+  .empty { text-align: center; padding: 18px 0 8px; }
+
+  /* ---------- Toast & sheet ---------- */
   .toast {
-    position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px);
-    width: calc(100% - 32px); max-width: 448px; padding: 14px 16px; border-radius: 14px; font-weight: 600;
-    opacity: 0; pointer-events: none; transition: .25s; white-space: pre-line; z-index: 10; box-shadow: 0 8px 28px rgba(0,0,0,.18);
+    position: fixed; left: 50%; top: calc(12px + env(safe-area-inset-top)); transform: translate(-50%, -20px);
+    width: calc(100% - 32px); max-width: 448px; padding: 13px 16px; border-radius: 16px; font-weight: 500; font-size: 15px;
+    opacity: 0; pointer-events: none; transition: .3s cubic-bezier(.2,.9,.3,1.2); white-space: pre-line; z-index: 30;
+    background: var(--ink); color: var(--bg); box-shadow: 0 12px 32px -8px rgba(0,0,0,.35);
   }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .toast.ok { background: var(--ok); color: #fff; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
   .toast.bad { background: var(--bad); color: #fff; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .toast { color: #0b1515 !important; } }
-  .spin { width: 18px; height: 18px; border: 2.5px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: sp .7s linear infinite; display: inline-block; vertical-align: -3px; }
+  .sheet-bg { position: fixed; inset: 0; background: rgba(5,12,20,.45); opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 20; }
+  .sheet { position: fixed; left: 50%; bottom: 0; transform: translate(-50%, 110%); width: 100%; max-width: 480px; z-index: 21;
+    background: var(--card); border-radius: 28px 28px 0 0; padding: 10px 20px calc(22px + env(safe-area-inset-bottom)); text-align: center;
+    transition: transform .38s cubic-bezier(.2,.9,.3,1), visibility 0s .38s; visibility: hidden; }
+  .sheet.show { transform: translate(-50%, 0); visibility: visible; transition: transform .38s cubic-bezier(.2,.9,.3,1); }
+  .sheet-bg.show { opacity: 1; pointer-events: auto; }
+  .grab { width: 40px; height: 5px; border-radius: 9px; background: var(--line); margin: 0 auto 16px; }
+  .check { width: 76px; height: 76px; margin: 4px auto 10px; border-radius: 50%; display: grid; place-items: center; background: var(--ok-soft); color: var(--ok); }
+  .check.out { background: color-mix(in srgb, var(--out) 15%, transparent); color: var(--out); }
+  .check svg { width: 40px; height: 40px; stroke: currentColor; fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .check path { stroke-dasharray: 40; stroke-dashoffset: 40; }
+  .sheet.show .check path { animation: draw .5s .15s ease forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .sheet .title { font-size: 19px; font-weight: 600; }
+  .sheet .big-time { font-family: "Prompt"; font-size: 44px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; margin: 6px 0; }
+  .sheet .sub { color: var(--muted); font-size: 14px; margin-top: 8px; }
+  .btn-primary { width: 100%; margin-top: 18px; min-height: 52px; border: 0; border-radius: 16px; font: inherit; font-weight: 600; font-size: 16px;
+    color: #fff; background: linear-gradient(135deg, #0d9488, #2563eb); cursor: pointer; }
+
+  .spin { width: 28px; height: 28px; border: 3px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: sp .7s linear infinite; display: inline-block; }
+  .hist .spin { width: 16px; height: 16px; border-width: 2px; vertical-align: -3px; }
   @keyframes sp { to { transform: rotate(360deg); } }
-  .coords { font-family: ui-monospace, monospace; font-size: 13px; word-break: break-all; }
-  footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 18px; }
+  footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 18px; }
   .hidden { display: none !important; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  @media (max-width: 360px) { .clock { font-size: 54px; } .punch-zone { width: 176px; height: 176px; } .punch { width: 136px; height: 136px; } }
 </style>
 </head>
 <body>
-<header class="top">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-in" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></symbol>
+  <symbol id="i-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-hour" viewBox="0 0 24 24"><path d="M6 2h12M6 22h12M7 2c0 5 10 5 10 10S7 17 7 22M17 2c0 5-10 5-10 10s10 5 10 10"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></symbol>
+</svg>
+
+<header class="hero">
   <div class="inner">
-    <div class="ward" id="wardName">หอผู้ป่วย MICU 2(240)</div>
-    <h1>MICU 2 เวลาเข้า-ออกงาน</h1>
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo"><svg class="i"><use href="#i-clock"/></svg></div>
+        <div>
+          <h1>MICU 2 เวลาเข้า-ออกงาน</h1>
+          <div class="ward" id="wardName">หอผู้ป่วย MICU 2(240)</div>
+        </div>
+      </div>
+      <span id="gpsPill" class="pill warn"><span class="dot"></span>กำลังหาตำแหน่ง</span>
+    </div>
+
+    <label class="who glass" for="staff">
+      <div class="avatar" id="avatar" aria-hidden="true">?</div>
+      <div class="meta">
+        <div class="greet" id="greet">สวัสดี</div>
+        <div class="who-name" id="whoName">แตะเพื่อเลือกชื่อของคุณ</div>
+      </div>
+      <svg class="i chev" aria-hidden="true"><use href="#i-down"/></svg>
+      <select id="staff" aria-label="ชื่อผู้ลงเวลา"><option value="">กำลังโหลดรายชื่อ…</option></select>
+    </label>
+
+    <div class="time-wrap" aria-live="off">
+      <div class="clock" id="clock">--:--<small>:--</small></div>
+      <div class="date" id="date">&nbsp;</div>
+    </div>
   </div>
 </header>
 
 <main class="wrap">
-  <section class="card clock-card" aria-live="off">
-    <div class="clock" id="clock">--:--<small>:--</small></div>
-    <div class="date" id="date">&nbsp;</div>
-  </section>
-
   <div class="banner hidden" id="demoBanner">
-    โหมดทดลอง: ยังไม่ได้เชื่อม Google Sheets ข้อมูลจะเก็บในเครื่องนี้เท่านั้น
-    (เปิดลิงก์ที่มี ?api=URL /exec หรือใส่ API_URL_FIXED ใน index.html)
+    <svg class="i" aria-hidden="true"><use href="#i-info"/></svg>
+    <div><b>โหมดทดลอง</b> — ยังไม่ได้เชื่อม Google Sheets ข้อมูลเก็บในเครื่องนี้เท่านั้น
+    (เปิดลิงก์ที่มี ?api=URL /exec หรือใส่ API_URL_FIXED ใน index.html)</div>
   </div>
 
-  <section class="card pad">
-    <label class="lbl" for="staff">ชื่อผู้ลงเวลา</label>
-    <select id="staff"><option value="">กำลังโหลดรายชื่อ…</option></select>
-  </section>
+  <section class="card punch-card" aria-live="polite">
+    <div class="seg" id="shifts" role="group" aria-label="เลือกเวร"></div>
 
-  <section class="card pad status-open hidden" id="openCard" aria-live="polite">
-    <div class="row between">
-      <span class="pill info"><span class="dot"></span>กำลังปฏิบัติงาน</span>
-      <span class="small muted" id="openDate"></span>
+    <div class="open-chip hidden" id="openCard">
+      <span class="dot"></span><span id="openText"></span><span class="muted small" id="openDate" style="font-weight:500"></span>
     </div>
-    <div style="margin-top:8px;font-size:18px;font-weight:600" id="openText"></div>
+
+    <div class="punch-zone" id="punchZone">
+      <button class="punch" id="btnIn" type="button" disabled>
+        <svg class="i" aria-hidden="true"><use href="#i-in"/></svg>
+        <span class="lbl">เข้างาน</span><small id="btnInSub">เลือกเวร</small>
+      </button>
+      <button class="punch out hidden" id="btnOut" type="button" disabled>
+        <svg class="i" aria-hidden="true"><use href="#i-out"/></svg>
+        <span class="lbl">ออกงาน</span><small>แตะเพื่อลงเวลาออก</small>
+      </button>
+    </div>
+    <div class="hint" id="hint">&nbsp;</div>
+
+    <div class="stats">
+      <div class="stat"><div class="k"><svg class="i"><use href="#i-in"/></svg>เข้างาน</div><div class="v" id="statIn">--:--</div></div>
+      <div class="stat"><div class="k"><svg class="i"><use href="#i-out"/></svg>ออกงาน</div><div class="v" id="statOut">--:--</div></div>
+      <div class="stat"><div class="k"><svg class="i"><use href="#i-hour"/></svg>ทำงาน</div><div class="v" id="statHours">--</div></div>
+    </div>
   </section>
 
   <section class="card pad" aria-live="polite">
-    <div class="row between">
-      <span class="lbl" style="margin:0">ตำแหน่งปัจจุบัน</span>
-      <span id="gpsPill" class="pill warn"><span class="dot"></span>กำลังหาตำแหน่ง</span>
-    </div>
-    <div class="row between" style="margin-top:6px">
-      <div><span class="gps-dist" id="gpsDist">–</span> <span class="muted small" id="gpsUnit"></span></div>
-      <button class="linkbtn" id="gpsRefresh" type="button">หาตำแหน่งใหม่</button>
+    <div class="row">
+      <div class="loc-ic"><svg class="i"><use href="#i-pin"/></svg></div>
+      <div style="flex:1;min-width:0">
+        <div class="small muted">ระยะห่างจากหอผู้ป่วย</div>
+        <div><span class="gps-dist" id="gpsDist">–</span> <span class="muted small" id="gpsUnit"></span></div>
+      </div>
+      <button class="linkbtn" id="gpsRefresh" type="button" aria-label="หาตำแหน่งใหม่"><svg class="i"><use href="#i-refresh"/></svg>ใหม่</button>
     </div>
     <div class="meter" aria-hidden="true"><i id="gpsMeter"></i></div>
     <div class="small muted" id="gpsNote">อนุญาตการเข้าถึงตำแหน่งเพื่อยืนยันว่าอยู่ในหอผู้ป่วย</div>
     <details class="small muted" style="margin-top:8px">
       <summary>พิกัดของเครื่องนี้ (สำหรับผู้ดูแลตั้งค่า)</summary>
-      <div class="coords" id="gpsCoords" style="margin-top:6px">-</div>
+      <div class="coords" id="gpsCoords">-</div>
       <button class="linkbtn" id="copyCoords" type="button">คัดลอกพิกัด</button>
     </details>
   </section>
 
   <section class="card pad">
-    <div class="lbl">เลือกเวร</div>
-    <div class="shifts" id="shifts" role="group" aria-label="เลือกเวร"></div>
-  </section>
-
-  <section class="actions" style="margin-bottom:12px">
-    <button class="big in" id="btnIn" type="button" disabled>ลงเวลาเข้า<small id="btnInSub">เข้างาน</small></button>
-    <button class="big out" id="btnOut" type="button" disabled>ลงเวลาออก<small>ออกงาน</small></button>
-  </section>
-
-  <section class="card pad">
     <div class="row between">
-      <span class="lbl" style="margin:0">ประวัติล่าสุด</span>
-      <button class="linkbtn" id="reload" type="button">รีเฟรช</button>
+      <h2 class="sec-title">ประวัติล่าสุด</h2>
+      <button class="linkbtn" id="reload" type="button"><svg class="i"><use href="#i-refresh"/></svg>รีเฟรช</button>
     </div>
-    <ul class="hist" id="hist"><li class="muted small">เลือกชื่อเพื่อดูประวัติ</li></ul>
+    <ul class="hist" id="hist"><li class="muted small empty">เลือกชื่อเพื่อดูประวัติ</li></ul>
   </section>
 
   <footer>หอผู้ป่วย MICU 2(240) · เวลาอ้างอิงจากเซิร์ฟเวอร์ (เวลาประเทศไทย)</footer>
 </main>
 
 <div class="toast" id="toast" role="status" aria-live="assertive"></div>
+<div class="sheet-bg" id="sheetBg"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="grab"></div>
+  <div class="check" id="sheetCheck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+  <div class="title" id="sheetTitle"></div>
+  <div class="big-time" id="sheetTime"></div>
+  <div id="sheetStatus"></div>
+  <div class="sub" id="sheetSub"></div>
+  <button class="btn-primary" id="sheetOk" type="button">เรียบร้อย</button>
+</div>
 
 <script>
 /* =====================================================================
@@ -234,6 +379,17 @@ function tick() {
   const d = bkk(now());
   $('clock').innerHTML = `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}<small>:${pad(d.getUTCSeconds())}</small>`;
   $('date').textContent = `วัน${TH_DAYS[d.getUTCDay()]}ที่ ${d.getUTCDate()} ${TH_MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()+543}`;
+  const h = d.getUTCHours();
+  $('greet').textContent = h >= 5 && h < 12 ? 'อรุณสวัสดิ์ ☀️' : h < 17 && h >= 12 ? 'สวัสดีตอนบ่าย' : h >= 17 && h < 21 ? 'สวัสดีตอนเย็น' : 'สวัสดี เวรดึก 🌙';
+  if (state.open) $('statHours').textContent = fmtDur(now() - openInMs(state.open));
+}
+function fmtDur(ms) { const m = Math.max(0, Math.floor(ms / 60000)); return `${Math.floor(m/60)}:${pad(m%60)}`; }
+/** เวลาเข้างาน (ms) ของรายการที่ยังไม่ลงเวลาออก — เวรดึกอาจลงเวลาเข้าก่อนเที่ยงคืน */
+function openInMs(o) {
+  const [y,m,d] = o.date.split('-').map(Number), [hh,mm] = o.inTime.split(':').map(Number);
+  let t = Date.UTC(y, m-1, d, hh, mm) - TZ_OFF;
+  if (t > now() + 60000) t -= 86400000;
+  return t;
 }
 
 /* ---------- เวร ---------- */
@@ -313,7 +469,7 @@ function renderGps() {
   }
   const d = distance(), ok = d <= c.radius;
   $('gpsDist').textContent = d.toLocaleString('th-TH');
-  $('gpsUnit').textContent = `ม. จากหอผู้ป่วย (รัศมี ${c.radius} ม.)`;
+  $('gpsUnit').textContent = `ม. · รัศมีที่อนุญาต ${c.radius} ม.`;
   const m = $('gpsMeter');
   m.style.width = Math.max(4, Math.min(100, (1 - Math.min(d, c.radius*3)/(c.radius*3)) * 100)) + '%';
   m.style.background = ok ? 'var(--ok)' : 'var(--bad)';
@@ -379,7 +535,7 @@ function demoApi(method, p) {
 /* ---------- UI ---------- */
 let toastTimer;
 function toast(msg, kind = 'ok') {
-  const el = $('toast'); el.textContent = msg; el.className = `toast ${kind} show`;
+  const el = $('toast'); el.textContent = msg; el.className = `toast ${kind === 'bad' ? 'bad' : ''} show`;
   clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), kind === 'bad' ? 6000 : 3500);
   if (navigator.vibrate) navigator.vibrate(kind === 'ok' ? 60 : [80, 60, 80]);
 }
@@ -389,37 +545,80 @@ function statusPill(text) {
   const k = /สาย|ออกก่อน/.test(text) ? 'warn' : /ยังไม่/.test(text) ? 'bad' : 'ok';
   return `<span class="pill ${k}">${esc(text)}</span>`;
 }
+const SHIFT_CODE = { 'เช้า': 'M', 'บ่าย': 'A', 'ดึก': 'N' };
 function renderStatus(data) {
   state.open = data.open;
   const oc = $('openCard');
   if (data.open) {
     oc.classList.remove('hidden');
-    $('openText').textContent = `เวร${data.open.shift} · เข้า ${data.open.inTime} น.`;
-    $('openDate').textContent = `วันที่เวร ${data.open.dateTh}`;
+    $('openText').textContent = `กำลังปฏิบัติงาน · เวร${data.open.shift}`;
+    $('openDate').textContent = data.open.dateTh;
   } else oc.classList.add('hidden');
+  const last = data.open || (data.recent && data.recent[0]);
+  $('statIn').textContent = last ? last.inTime : '--:--';
+  $('statOut').textContent = last && last.outTime ? last.outTime : '--:--';
+  $('statHours').textContent = data.open ? fmtDur(now() - openInMs(data.open))
+    : (last && last.hours !== '' && last.hours != null ? fmtDur(Number(last.hours) * 3600000) : '--');
   const h = $('hist');
-  if (!data.recent || !data.recent.length) { h.innerHTML = '<li class="muted small">ยังไม่มีประวัติการลงเวลา</li>'; return; }
+  if (!data.recent || !data.recent.length) { h.innerHTML = '<li class="muted small empty">ยังไม่มีประวัติการลงเวลา</li>'; return; }
   h.innerHTML = data.recent.map(r => `
     <li>
-      <div class="row between"><b>เวร${esc(r.shift)}</b><span class="small muted">${esc(r.dateTh)}</span></div>
-      <div class="row between t small" style="margin-top:4px">
-        <span>เข้า ${esc(r.inTime)} ${statusPill(r.inStatus)}</span>
-        <span>ออก ${r.outTime ? esc(r.outTime) + ' ' + statusPill(r.outStatus) : '<span class="muted">–</span>'}</span>
+      <div class="h-ic ${SHIFT_CODE[r.shift] || 'M'}">${esc(String(r.shift || '').slice(0, 1))}</div>
+      <div class="h-body">
+        <div class="row between"><b>เวร${esc(r.shift)}</b><span class="small muted">${esc(r.dateTh)}</span></div>
+        <div class="h-times">
+          <span>เข้า <b>${esc(r.inTime)}</b>${statusPill(r.inStatus)}</span>
+          <span>ออก <b>${r.outTime ? esc(r.outTime) + '</b>' + statusPill(r.outStatus) : '–</b>'}</span>
+        </div>
       </div>
     </li>`).join('');
 }
 function updateButtons() {
-  const staffOk = !!$('staff').value, gpsOk = state.cfg && inRange(), free = !state.busy;
-  $('btnIn').disabled = !(staffOk && gpsOk && free && state.shift && !state.open);
-  $('btnOut').disabled = !(staffOk && gpsOk && free && state.open);
+  const staffOk = !!$('staff').value, gpsOk = !!(state.cfg && inRange()), free = !state.busy;
+  const inBtn = $('btnIn'), outBtn = $('btnOut');
+  inBtn.classList.toggle('hidden', !!state.open);
+  outBtn.classList.toggle('hidden', !state.open);
+  inBtn.disabled = !(staffOk && gpsOk && free && state.shift && !state.open);
+  outBtn.disabled = !(staffOk && gpsOk && free && state.open);
   const sh = state.cfg && state.cfg.shifts.find(s => s.code === state.shift);
   const sub = $('btnInSub');
-  if (sub) sub.textContent = state.open ? 'ลงเวลาออกก่อน' : (sh ? `เวร${sh.name}` : 'เลือกเวร');
+  if (sub) sub.textContent = sh ? `เวร${sh.name} ${sh.start}–${sh.end}` : 'เลือกเวร';
+  const ready = state.open ? !outBtn.disabled : !inBtn.disabled;
+  const zone = $('punchZone');
+  zone.classList.toggle('live', ready);
+  zone.style.setProperty('--ring', state.open ? 'var(--out)' : 'var(--brand)');
+  let hint = '';
+  if (!state.cfg) hint = 'กำลังเชื่อมต่อระบบ…';
+  else if (!staffOk) hint = 'แตะชื่อด้านบนเพื่อเลือกชื่อของคุณ';
+  else if (!state.pos) hint = 'กำลังหาตำแหน่ง GPS…';
+  else if (state.cfg.lat == null) hint = 'ยังไม่ได้ตั้งพิกัดหอผู้ป่วย';
+  else if (!gpsOk) hint = 'คุณอยู่นอกพื้นที่หอผู้ป่วย';
+  else if (!state.open && !state.shift) hint = 'เลือกเวรก่อนลงเวลาเข้า';
+  else hint = state.open ? 'พร้อมลงเวลาออก' : 'พร้อมลงเวลาเข้า';
+  $('hint').textContent = hint;
 }
+function renderWho() {
+  const c = state.cfg, id = $('staff').value;
+  const st = c && c.staff.find(s => s.id === id);
+  const name = st ? st.name.replace(/^(นาง(สาว)?|นาย|น\.ส\.)\s*/, '') : '';
+  $('whoName').textContent = st ? st.name : 'แตะเพื่อเลือกชื่อของคุณ';
+  $('avatar').textContent = name ? name.match(/[ก-ฮA-Za-z]/)?.[0] || name[0] : '?';
+}
+function showSheet(kind, title, time, statusText, sub) {
+  $('sheetCheck').className = 'check' + (kind === 'out' ? ' out' : '');
+  $('sheetTitle').textContent = title;
+  $('sheetTime').textContent = time;
+  $('sheetStatus').innerHTML = statusPill(statusText);
+  $('sheetSub').textContent = sub;
+  $('sheet').classList.add('show'); $('sheetBg').classList.add('show');
+  if (navigator.vibrate) navigator.vibrate(60);
+  setTimeout(() => $('sheetOk').focus(), 50);
+}
+function hideSheet() { $('sheet').classList.remove('show'); $('sheetBg').classList.remove('show'); }
 async function loadStatus() {
   const id = $('staff').value;
   if (!id) { renderStatus({ open:null, recent:[] }); updateButtons(); return; }
-  $('hist').innerHTML = '<li class="muted small"><span class="spin"></span> กำลังโหลด…</li>';
+  $('hist').innerHTML = '<li class="muted small empty"><span class="spin"></span> กำลังโหลด…</li>';
   try { renderStatus(await api('GET', { action:'status', id })); }
   catch (e) { $('hist').innerHTML = `<li class="small" style="color:var(--bad)">${esc(e.message)}</li>`; }
   updateButtons();
@@ -434,8 +633,8 @@ async function punch(action) {
     const r = await api('POST', { action, id: $('staff').value, shift: state.shift,
       lat: p.lat, lng: p.lng, accuracy: p.acc, ua: navigator.userAgent });
     const rec = r.record;
-    const extra = action === 'checkin' ? `เวลา ${rec.inTime} น. · ${rec.inStatus}` : `เวลา ${rec.outTime} น. · ${rec.outStatus} · ${rec.hours} ชม.`;
-    toast(`${r.message}\n${extra}`, 'ok');
+    if (action === 'checkin') showSheet('in', r.message, rec.inTime, rec.inStatus, `วันที่เวร ${rec.dateTh}`);
+    else showSheet('out', r.message, rec.outTime, rec.outStatus, `เวลาทำงาน ${fmtDur(Number(rec.hours) * 3600000)} ชม. · วันที่เวร ${rec.dateTh}`);
     await loadStatus();
   } catch (e) { toast(e.message || 'เชื่อมต่อไม่สำเร็จ กรุณาลองใหม่', 'bad'); }
   finally { state.busy = false; btn.innerHTML = label; updateButtons(); }
@@ -457,7 +656,8 @@ async function init() {
   sel.innerHTML = '<option value="">— เลือกชื่อของคุณ —</option>' +
     state.cfg.staff.map(s => `<option value="${esc(s.id)}">${esc(s.name)}${s.position ? ' · ' + esc(s.position) : ''}</option>`).join('');
   if (saved && state.cfg.staff.some(s => s.id === saved)) sel.value = saved;
-  sel.onchange = () => { LS.set('micu2_staff', sel.value); loadStatus(); };
+  sel.onchange = () => { LS.set('micu2_staff', sel.value); renderWho(); loadStatus(); };
+  renderWho();
   state.shift = suggestShift();
   renderShifts(); renderGps(); updateButtons(); loadStatus();
   setInterval(() => { renderShifts(); updateButtons(); }, 60000);
@@ -467,6 +667,9 @@ $('btnIn').onclick = () => punch('checkin');
 $('btnOut').onclick = () => punch('checkout');
 $('gpsRefresh').onclick = startGps;
 $('reload').onclick = loadStatus;
+$('sheetOk').onclick = hideSheet;
+$('sheetBg').onclick = hideSheet;
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideSheet(); });
 $('copyCoords').onclick = async () => {
   if (!state.pos) return toast('ยังไม่ได้รับพิกัด', 'bad');
   const t = `${state.pos.lat.toFixed(6)},${state.pos.lng.toFixed(6)}`;
