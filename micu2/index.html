@@ -221,6 +221,52 @@
   .hist .spin { width: 16px; height: 16px; border-width: 2px; vertical-align: -3px; }
   @keyframes sp { to { transform: rotate(360deg); } }
   footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 18px; }
+
+  /* ---------- Admin ---------- */
+  .gear { width: 40px; height: 40px; border-radius: 12px; border: 0; color: #fff; display: grid; place-items: center; cursor: pointer; flex: none; }
+  .gear svg.i { width: 22px; height: 22px; }
+  .gps-row { margin-top: 12px; display: flex; justify-content: center; }
+  .admin { position: fixed; inset: 0; z-index: 25; background: var(--bg); overflow-y: auto; -webkit-overflow-scrolling: touch;
+    transform: translateX(100%); transition: transform .3s cubic-bezier(.2,.9,.3,1); visibility: hidden; }
+  .admin.show { transform: none; visibility: visible; }
+  .admin-bar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 8px; padding: calc(10px + env(safe-area-inset-top)) 12px 10px;
+    background: linear-gradient(135deg, var(--hero-1), var(--hero-2)); color: #fff; }
+  .admin-bar h2 { margin: 0; font-family: "Prompt"; font-size: 17px; font-weight: 600; flex: 1; }
+  .admin-bar button { background: rgba(255,255,255,.16); border: 0; color: #fff; font: inherit; font-size: 14px; border-radius: 10px; padding: 8px 12px; cursor: pointer; min-height: 40px; }
+  .admin-body { max-width: 560px; margin: 0 auto; padding: 14px 16px calc(28px + env(safe-area-inset-bottom)); }
+  .admin .seg { grid-template-columns: repeat(4, 1fr); margin-bottom: 14px; }
+  .admin .seg .shift { min-height: 44px; font-size: 14px; }
+  .field { display: block; margin-bottom: 12px; }
+  .field > span { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; font-weight: 500; }
+  .inp { width: 100%; font: inherit; font-size: 16px; color: var(--ink); background: var(--track); border: 1.5px solid transparent;
+    border-radius: 12px; padding: 11px 13px; min-height: 46px; }
+  .inp:focus { outline: none; border-color: var(--brand); background: var(--card); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border-radius: 14px; border: 0;
+    font: inherit; font-weight: 600; font-size: 15px; cursor: pointer; width: 100%; }
+  .btn.pri { color: #fff; background: linear-gradient(135deg, #0d9488, #2563eb); }
+  .btn.sec { color: var(--brand); background: var(--brand-soft); }
+  .btn.dan { color: var(--bad); background: var(--bad-soft); }
+  .btn[disabled] { opacity: .5; cursor: not-allowed; }
+  .btn + .btn { margin-top: 10px; }
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .kpi { background: var(--card); border-radius: 16px; padding: 12px 8px; text-align: center; box-shadow: var(--shadow); }
+  .kpi .v { font-family: "Prompt"; font-size: 26px; font-weight: 600; line-height: 1.1; }
+  .kpi .k { font-size: 12.5px; color: var(--muted); }
+  .list { list-style: none; margin: 0; padding: 0; }
+  .list li { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .list li:first-child { border-top: 0; }
+  .list .grow { flex: 1; min-width: 0; }
+  .list .nm { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .list .sub2 { font-size: 13px; color: var(--muted); }
+  .list button.rowbtn { background: none; border: 0; padding: 0; margin: 0; text-align: left; font: inherit; color: inherit; cursor: pointer; display: flex; gap: 12px; align-items: center; width: 100%; }
+  .grp-title { font-family: "Prompt"; font-weight: 600; font-size: 15px; margin: 4px 0 2px; display: flex; align-items: center; gap: 8px; }
+  .off { opacity: .5; }
+  .chk { display: flex; align-items: center; gap: 10px; font-size: 15px; margin: 4px 0 14px; cursor: pointer; }
+  .chk input { width: 22px; height: 22px; accent-color: var(--brand); }
+  .help { font-size: 13px; color: var(--muted); margin: -4px 0 12px; line-height: 1.5; }
+  .mono { font-family: ui-monospace, Menlo, monospace; font-size: 14px; }
   .hidden { display: none !important; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
   @media (max-width: 360px) { .clock { font-size: 54px; } .punch-zone { width: 176px; height: 176px; } .punch { width: 136px; height: 136px; } }
@@ -235,6 +281,7 @@
   <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
   <symbol id="i-hour" viewBox="0 0 24 24"><path d="M6 2h12M6 22h12M7 2c0 5 10 5 10 10S7 17 7 22M17 2c0 5-10 5-10 10s10 5 10 10"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></symbol>
 </svg>
 
@@ -248,7 +295,7 @@
           <div class="ward" id="wardName">หอผู้ป่วย MICU 2(240)</div>
         </div>
       </div>
-      <span id="gpsPill" class="pill warn"><span class="dot"></span>กำลังหาตำแหน่ง</span>
+      <button class="gear glass" id="adminBtn" type="button" aria-label="ตั้งค่าสำหรับผู้ดูแล"><svg class="i"><use href="#i-gear"/></svg></button>
     </div>
 
     <label class="who glass" for="staff">
@@ -264,6 +311,7 @@
     <div class="time-wrap" aria-live="off">
       <div class="clock" id="clock">--:--<small>:--</small></div>
       <div class="date" id="date">&nbsp;</div>
+      <div class="gps-row"><span id="gpsPill" class="pill warn"><span class="dot"></span>กำลังหาตำแหน่ง</span></div>
     </div>
   </div>
 </header>
@@ -329,6 +377,118 @@
 
   <footer>หอผู้ป่วย MICU 2(240) · เวลาอ้างอิงจากเซิร์ฟเวอร์ (เวลาประเทศไทย)</footer>
 </main>
+
+<section class="admin" id="admin" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+  <div class="admin-bar">
+    <button type="button" id="adminClose" aria-label="กลับหน้าลงเวลา">‹ กลับ</button>
+    <h2 id="adminTitle">⚙️ ผู้ดูแลระบบ</h2>
+    <button type="button" id="adminLogout" class="hidden">ออกจากระบบ</button>
+  </div>
+  <div class="admin-body">
+    <!-- เข้าสู่ระบบ -->
+    <div id="adminLogin" class="card pad">
+      <h3 class="sec-title" style="margin-bottom:6px">สำหรับหัวหน้าหอ / ผู้ดูแล</h3>
+      <p class="help" style="margin:0 0 14px">ใส่รหัสผ่านผู้ดูแล (ค่า ADMIN_PASSWORD ในชีต "ตั้งค่า")</p>
+      <form id="loginForm">
+        <label class="field"><span>รหัสผ่าน</span><input class="inp" type="password" id="adminPw" autocomplete="current-password" required></label>
+        <button class="btn pri" type="submit" id="loginBtn">เข้าสู่ระบบ</button>
+      </form>
+    </div>
+
+    <div id="adminMain" class="hidden">
+      <div class="seg" role="tablist" id="adminTabs">
+        <button class="shift" data-tab="day" aria-pressed="true"><b>ภาพรวม</b></button>
+        <button class="shift" data-tab="staff" aria-pressed="false"><b>รายชื่อ</b></button>
+        <button class="shift" data-tab="export" aria-pressed="false"><b>ส่งออก</b></button>
+        <button class="shift" data-tab="settings" aria-pressed="false"><b>ตั้งค่า</b></button>
+      </div>
+
+      <!-- ภาพรวม -->
+      <div data-panel="day">
+        <div class="card pad">
+          <div class="grid2" style="align-items:end">
+            <label class="field" style="margin:0"><span>วันที่เวร</span><input class="inp" type="date" id="dayDate"></label>
+            <button class="btn sec" type="button" id="dayLoad">แสดง</button>
+          </div>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="v" id="kOn">–</div><div class="k">กำลังปฏิบัติงาน</div></div>
+          <div class="kpi"><div class="v" id="kIn">–</div><div class="k">ลงเวลาวันนี้</div></div>
+          <div class="kpi"><div class="v" id="kLate" style="color:var(--warn)">–</div><div class="k">มาสาย</div></div>
+        </div>
+        <div class="card pad" id="dayList"><div class="muted small">กำลังโหลด…</div></div>
+      </div>
+
+      <!-- รายชื่อ -->
+      <div data-panel="staff" class="hidden">
+        <div class="card pad" id="staffFormCard">
+          <h3 class="sec-title" id="staffFormTitle" style="margin-bottom:12px">เพิ่มพยาบาล</h3>
+          <form id="staffForm">
+            <input type="hidden" id="sfOrig">
+            <div class="grid2">
+              <label class="field"><span>รหัสพนักงาน *</span><input class="inp" id="sfId" inputmode="numeric" required maxlength="20"></label>
+              <label class="field"><span>ตำแหน่ง</span><input class="inp" id="sfPos" list="posList" placeholder="พยาบาลวิชาชีพ"></label>
+            </div>
+            <datalist id="posList"><option>พยาบาลวิชาชีพ</option><option>พยาบาลวิชาชีพชำนาญการ</option><option>พยาบาลวิชาชีพชำนาญการพิเศษ</option><option>หัวหน้าหอผู้ป่วย</option><option>ผู้ช่วยพยาบาล</option><option>พนักงานช่วยการพยาบาล</option></datalist>
+            <label class="field"><span>ชื่อ-สกุล *</span><input class="inp" id="sfName" required maxlength="80" placeholder="เช่น นางสาวสมใจ ใจดี"></label>
+            <label class="chk"><input type="checkbox" id="sfActive" checked> ใช้งาน (แสดงในรายชื่อให้เลือกลงเวลา)</label>
+            <button class="btn pri" type="submit" id="sfSave">บันทึก</button>
+            <button class="btn sec hidden" type="button" id="sfCancel">ยกเลิกการแก้ไข</button>
+            <button class="btn dan hidden" type="button" id="sfDelete">ลบรายชื่อนี้</button>
+          </form>
+        </div>
+        <div class="card pad">
+          <div class="row between"><h3 class="sec-title">รายชื่อทั้งหมด</h3><span class="small muted" id="staffCount"></span></div>
+          <p class="help" style="margin:6px 0 0">แตะชื่อเพื่อแก้ไข · คนที่ย้ายออก ให้ปิด "ใช้งาน" แทนการลบ เพื่อเก็บประวัติไว้</p>
+          <ul class="list" id="staffList"></ul>
+        </div>
+      </div>
+
+      <!-- ส่งออก -->
+      <div data-panel="export" class="hidden">
+        <div class="card pad">
+          <h3 class="sec-title" style="margin-bottom:12px">📥 ส่งออก Excel รายเดือน</h3>
+          <label class="field"><span>เดือน</span><input class="inp" type="month" id="exMonth"></label>
+          <label class="chk"><input type="checkbox" id="exAnon"> ไม่ระบุตัวตน (สำหรับงานวิจัย/วิทยานิพนธ์)</label>
+          <p class="help">ไฟล์มี 2 แผ่น: <b>สรุปรายเดือน</b> (ต่อคน) และ <b>บันทึกเวลา</b> (ทุกเวร) · ไม่รวมพิกัด GPS · แบบไม่ระบุตัวตนจะแทนชื่อด้วยรหัส P01, P02…</p>
+          <button class="btn pri" type="button" id="exBtn">ดาวน์โหลดไฟล์ Excel (.xlsx)</button>
+          <button class="btn sec" type="button" id="exCsv">ดาวน์โหลดแบบ CSV</button>
+        </div>
+      </div>
+
+      <!-- ตั้งค่า -->
+      <div data-panel="settings" class="hidden">
+        <div class="card pad">
+          <h3 class="sec-title" style="margin-bottom:8px">📍 พิกัดหอผู้ป่วย</h3>
+          <p class="help" style="margin:0 0 10px">ไปยืน<b>ในหอผู้ป่วย</b> แล้วกดปุ่มด้านล่างเพื่อใช้ตำแหน่งมือถือเครื่องนี้เป็นพิกัดหอผู้ป่วย</p>
+          <div class="small">ที่บันทึกไว้: <span class="mono" id="stSaved">–</span></div>
+          <div class="small" style="margin-bottom:12px">มือถือเครื่องนี้: <span class="mono" id="stHere">–</span></div>
+          <button class="btn pri" type="button" id="stUseHere">ใช้ตำแหน่งปัจจุบันเป็นพิกัดหอผู้ป่วย</button>
+        </div>
+        <div class="card pad">
+          <h3 class="sec-title" style="margin-bottom:12px">กติกาการลงเวลา</h3>
+          <form id="ruleForm">
+            <div class="grid2">
+              <label class="field"><span>รัศมีที่อนุญาต (เมตร)</span><input class="inp" type="number" id="stRadius" min="20" max="2000" inputmode="numeric"></label>
+              <label class="field"><span>ผ่อนผันมาสาย (นาที)</span><input class="inp" type="number" id="stGrace" min="0" max="120" inputmode="numeric"></label>
+            </div>
+            <label class="field"><span>ลงเวลาเข้าได้ก่อนเริ่มเวร (นาที)</span><input class="inp" type="number" id="stOpen" min="0" max="480" inputmode="numeric"></label>
+            <div class="grid3">
+              <label class="field"><span>เวรเช้า</span><input class="inp" id="stM" placeholder="08:00-16:00"></label>
+              <label class="field"><span>เวรบ่าย</span><input class="inp" id="stA" placeholder="16:00-24:00"></label>
+              <label class="field"><span>เวรดึก</span><input class="inp" id="stN" placeholder="00:00-08:00"></label>
+            </div>
+            <button class="btn pri" type="submit">บันทึกกติกา</button>
+          </form>
+        </div>
+        <div class="card pad">
+          <h3 class="sec-title" style="margin-bottom:8px">ข้อมูลระบบ</h3>
+          <p class="help" style="margin:0">ข้อมูลทั้งหมดเก็บใน Google Sheet ของผู้ดูแล เปิดดูหรือแก้ไขโดยตรงได้จากบัญชี Google ที่สร้างระบบ · รหัสผ่านผู้ดูแลแก้ได้ที่ค่า ADMIN_PASSWORD ในชีต "ตั้งค่า"</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <div class="toast" id="toast" role="status" aria-live="assertive"></div>
 <div class="sheet-bg" id="sheetBg"></div>
@@ -594,8 +754,8 @@ function updateButtons() {
   let hint = '', warn = true;
   if (state.cfgError) hint = 'เชื่อมต่อระบบไม่สำเร็จ — ตรวจสัญญาณอินเทอร์เน็ต แล้วดึงหน้าจอลงเพื่อโหลดใหม่';
   else if (!state.cfg) { hint = 'กำลังเชื่อมต่อระบบ…'; warn = false; }
-  else if (!state.cfg.staff.length) hint = 'ยังไม่มีรายชื่อพยาบาลในระบบ — ผู้ดูแลต้องเพิ่มชื่อในชีต "รายชื่อพยาบาล"';
-  else if (state.cfg.lat == null) hint = 'ยังไม่ได้ตั้งพิกัดหอผู้ป่วย — ผู้ดูแลต้องใส่ LAT/LNG ในชีต "ตั้งค่า"';
+  else if (!state.cfg.staff.length) hint = 'ยังไม่มีรายชื่อพยาบาลในระบบ — ผู้ดูแลกด ⚙️ มุมขวาบน → รายชื่อ เพื่อเพิ่มชื่อ';
+  else if (state.cfg.lat == null) hint = 'ยังไม่ได้ตั้งพิกัดหอผู้ป่วย — ผู้ดูแลกด ⚙️ → ตั้งค่า → ใช้ตำแหน่งปัจจุบัน';
   else if (!staffOk) hint = 'แตะชื่อด้านบนเพื่อเลือกชื่อของคุณก่อน';
   else if (!state.pos) hint = 'กำลังหาตำแหน่ง GPS… (ต้องกด "อนุญาต" ให้ใช้ตำแหน่ง)';
   else if (!gpsOk) hint = `คุณอยู่นอกพื้นที่หอผู้ป่วย (ห่าง ${distance().toLocaleString('th-TH')} ม.)`;
@@ -659,6 +819,11 @@ async function init() {
     toast('เชื่อมต่อระบบไม่สำเร็จ: ' + e.message, 'bad'); return;
   }
   if (!API_URL && state.pos) { state.cfg.lat = state.pos.lat; state.cfg.lng = state.pos.lng; }
+  applyConfig();
+  setInterval(() => { renderShifts(); updateButtons(); }, 60000);
+}
+
+function applyConfig() {
   $('wardName').textContent = 'หอผู้ป่วย ' + (state.cfg.ward || 'MICU 2(240)');
   const sel = $('staff'), saved = LS.get('micu2_staff', '');
   sel.innerHTML = '<option value="">— เลือกชื่อของคุณ —</option>' +
@@ -666,9 +831,8 @@ async function init() {
   if (saved && state.cfg.staff.some(s => s.id === saved)) sel.value = saved;
   sel.onchange = () => { LS.set('micu2_staff', sel.value); renderWho(); loadStatus(); };
   renderWho();
-  state.shift = suggestShift();
+  if (!state.shift) state.shift = suggestShift();
   renderShifts(); renderGps(); updateButtons(); loadStatus();
-  setInterval(() => { renderShifts(); updateButtons(); }, 60000);
 }
 
 $('btnIn').onclick = () => punch('checkin');
@@ -677,13 +841,203 @@ $('gpsRefresh').onclick = startGps;
 $('reload').onclick = loadStatus;
 $('sheetOk').onclick = hideSheet;
 $('sheetBg').onclick = hideSheet;
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideSheet(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { hideSheet(); closeAdmin(); } });
 $('copyCoords').onclick = async () => {
   if (!state.pos) return toast('ยังไม่ได้รับพิกัด', 'bad');
   const t = `${state.pos.lat.toFixed(6)},${state.pos.lng.toFixed(6)}`;
   try { await navigator.clipboard.writeText(t); toast('คัดลอกพิกัดแล้ว: ' + t); } catch (e) { toast(t); }
 };
 document.addEventListener('visibilitychange', () => { if (!document.hidden && state.cfg) { tick(); loadStatus(); } });
+/* ===================== ผู้ดูแล (ปุ่ม ⚙️) ===================== */
+const admin = { pw: null, settings: null, staff: [] };
+const SS = {
+  get(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { v === null ? sessionStorage.removeItem(k) : sessionStorage.setItem(k, v); } catch (e) {} }
+};
+function adminApi(action, extra = {}) { return api('POST', { action, pw: admin.pw, ...extra }); }
+function openAdmin() {
+  $('admin').classList.add('show');
+  if (!API_URL) { toast('ต้องเชื่อม Google Sheet ก่อนจึงใช้เมนูผู้ดูแลได้', 'bad'); }
+  const saved = SS.get('micu2_admin');
+  if (saved && !admin.pw) { admin.pw = saved; adminEnter(true); }
+  else if (!admin.pw) setTimeout(() => $('adminPw').focus(), 320);
+  else { const t = document.querySelector('#adminTabs .shift[aria-pressed="true"]'); showTab(t ? t.dataset.tab : 'day'); }
+}
+function closeAdmin() { $('admin').classList.remove('show'); }
+async function adminEnter(silent) {
+  const btn = $('loginBtn'); btn.disabled = true; btn.textContent = 'กำลังตรวจสอบ…';
+  try {
+    const r = await adminApi('adminLogin');
+    admin.settings = r.settings; admin.staff = r.staff;
+    SS.set('micu2_admin', admin.pw);
+    $('adminLogin').classList.add('hidden'); $('adminMain').classList.remove('hidden'); $('adminLogout').classList.remove('hidden');
+    renderStaffList(); fillSettings(); showTab('day');
+  } catch (e) {
+    admin.pw = null; SS.set('micu2_admin', null);
+    if (!silent) toast(e.message, 'bad');
+  } finally { btn.disabled = false; btn.textContent = 'เข้าสู่ระบบ'; }
+}
+function adminLogout() {
+  admin.pw = null; SS.set('micu2_admin', null);
+  $('adminMain').classList.add('hidden'); $('adminLogout').classList.add('hidden'); $('adminLogin').classList.remove('hidden');
+  $('adminPw').value = '';
+}
+function showTab(t) {
+  document.querySelectorAll('#adminTabs .shift').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tab === t)));
+  document.querySelectorAll('[data-panel]').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== t));
+  if (t === 'day') loadDay();
+  if (t === 'settings') fillSettings();
+}
+async function withBusy(btn, fn) {
+  const label = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<span class="spin" style="width:18px;height:18px;border-width:2px"></span>';
+  try { await fn(); } catch (e) { toast(e.message || 'ทำรายการไม่สำเร็จ', 'bad'); }
+  finally { btn.disabled = false; btn.innerHTML = label; }
+}
+
+/* ภาพรวมรายวัน */
+async function loadDay() {
+  const box = $('dayList');
+  box.innerHTML = '<div class="muted small"><span class="spin" style="width:16px;height:16px;border-width:2px;vertical-align:-3px"></span> กำลังโหลด…</div>';
+  try {
+    const r = await adminApi('adminDay', { date: $('dayDate').value });
+    $('kOn').textContent = r.onDuty.length;
+    $('kIn').textContent = r.records.length;
+    $('kLate').textContent = r.records.filter(x => /สาย/.test(x.inStatus)).length;
+    const groups = ['ดึก', 'เช้า', 'บ่าย'].map(sh => [sh, r.records.filter(x => x.shift === sh)]);
+    box.innerHTML = `<div class="small muted" style="margin-bottom:6px">วันที่เวร ${esc(r.dateTh)}</div>` + groups.map(([sh, list]) => `
+      <div class="grp-title"><span class="h-ic ${SHIFT_CODE[sh]}" style="width:28px;height:28px;border-radius:9px;font-size:13px">${sh[0]}</span>เวร${sh}
+        <span class="small muted" style="font-weight:400">${list.length} คน</span></div>
+      <ul class="list" style="margin-bottom:10px">${list.length ? list.map(x => `
+        <li><div class="grow"><div class="nm">${esc(x.name)}</div>
+          <div class="sub2">เข้า ${esc(x.inTime)} ${statusPill(x.inStatus)} · ออก ${x.outTime ? esc(x.outTime) + ' ' + statusPill(x.outStatus) : '<span class="pill info">กำลังปฏิบัติงาน</span>'}</div></div></li>`).join('')
+        : '<li class="muted small">ยังไม่มีผู้ลงเวลา</li>'}</ul>`).join('');
+  } catch (e) { box.innerHTML = `<div class="small" style="color:var(--bad)">${esc(e.message)}</div>`; }
+}
+
+/* รายชื่อ */
+function renderStaffList() {
+  const list = admin.staff;
+  $('staffCount').textContent = `ใช้งาน ${list.filter(s => s.active).length} / ทั้งหมด ${list.length} คน`;
+  $('staffList').innerHTML = list.length ? list.map((s, i) => `
+    <li class="${s.active ? '' : 'off'}"><button class="rowbtn" type="button" data-i="${i}">
+      <div class="avatar" style="width:38px;height:38px;border-radius:12px;font-size:16px;background:var(--brand-soft);color:var(--brand)">${esc((s.name.replace(/^(นาง(สาว)?|นาย|น\.ส\.)\s*/, '').match(/[ก-ฮA-Za-z]/) || ['?'])[0])}</div>
+      <div class="grow"><div class="nm">${esc(s.name)}</div><div class="sub2">รหัส ${esc(s.id)}${s.position ? ' · ' + esc(s.position) : ''}${s.active ? '' : ' · ปิดใช้งาน'}</div></div>
+      <span class="muted">›</span></button></li>`).join('') : '<li class="muted small">ยังไม่มีรายชื่อ — เพิ่มได้จากแบบฟอร์มด้านบน</li>';
+  $('staffList').querySelectorAll('.rowbtn').forEach(b => b.onclick = () => editStaff(admin.staff[+b.dataset.i]));
+}
+function editStaff(s) {
+  $('sfOrig').value = s ? s.id : '';
+  $('sfId').value = s ? s.id : ''; $('sfName').value = s ? s.name : ''; $('sfPos').value = s ? s.position : '';
+  $('sfActive').checked = s ? s.active : true;
+  $('staffFormTitle').textContent = s ? 'แก้ไขรายชื่อ' : 'เพิ่มพยาบาล';
+  $('sfCancel').classList.toggle('hidden', !s); $('sfDelete').classList.toggle('hidden', !s);
+  if (s) { $('staffFormCard').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+}
+async function saveStaff(remove) {
+  const btn = remove ? $('sfDelete') : $('sfSave');
+  if (remove && !confirm(`ลบ "${$('sfName').value}" ออกจากรายชื่อ?\n(ประวัติการลงเวลาเดิมยังอยู่ในชีต)`)) return;
+  await withBusy(btn, async () => {
+    const r = await adminApi('adminSaveStaff', { staff: { origId: $('sfOrig').value, id: $('sfId').value.trim(),
+      name: $('sfName').value.trim(), position: $('sfPos').value.trim(), active: $('sfActive').checked, remove: !!remove } });
+    admin.staff = r.staff; renderStaffList(); editStaff(null); toast(r.message); reloadConfig();
+  });
+}
+
+/* ส่งออก */
+function loadScript(src) {
+  return new Promise((ok, fail) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = fail; document.head.appendChild(s); });
+}
+function anonymize(d) {
+  const ids = [...new Set([...d.summary.map(r => String(r[0])), ...d.logs.map(r => String(r[2]))])].sort();
+  const code = Object.fromEntries(ids.map((id, i) => [id, 'P' + String(i + 1).padStart(2, '0')]));
+  return { ...d,
+    summaryHeader: ['รหัสผู้เข้าร่วม', ...d.summaryHeader.slice(2)], summary: d.summary.map(r => [code[String(r[0])], ...r.slice(2)]),
+    logHeader: [d.logHeader[0], d.logHeader[1], 'รหัสผู้เข้าร่วม', ...d.logHeader.slice(4)], logs: d.logs.map(r => [r[0], r[1], code[String(r[2])], ...r.slice(4)]) };
+}
+async function getExport() {
+  const month = $('exMonth').value;
+  if (!/^\d{4}-\d{2}$/.test(month)) throw new Error('กรุณาเลือกเดือน');
+  let d = await adminApi('adminExport', { month });
+  if ($('exAnon').checked) d = anonymize(d);
+  return d;
+}
+function exportName(d, ext) { return `MICU2_attendance_${d.month}${$('exAnon').checked ? '_anonymous' : ''}.${ext}`; }
+function saveBlob(blob, name) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+}
+async function exportXlsx() {
+  const d = await getExport();
+  if (!window.XLSX) {
+    try { await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'); }
+    catch (e) { toast('โหลดตัวสร้าง Excel ไม่ได้ จะดาวน์โหลดเป็น CSV แทน', 'bad'); return exportCsvData(d); }
+  }
+  const wb = XLSX.utils.book_new();
+  const sheet = (title, header, rows) => {
+    const ws = XLSX.utils.aoa_to_sheet([[title], ['สร้างเมื่อ ' + d.created], [], header, ...rows]);
+    ws['!cols'] = header.map((h, i) => ({ wch: Math.max(String(h).length + 2, ...rows.map(r => String(r[i] ?? '').length + 2), 8) }));
+    ws['!freeze'] = { xSplit: 0, ySplit: 4 };
+    return ws;
+  };
+  XLSX.utils.book_append_sheet(wb, sheet(d.title, d.summaryHeader, d.summary), 'สรุปรายเดือน');
+  XLSX.utils.book_append_sheet(wb, sheet(`บันทึกเวลารายเวร เดือน${d.monthTh} (${d.logs.length} รายการ)`, d.logHeader, d.logs), 'บันทึกเวลา');
+  const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  saveBlob(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), exportName(d, 'xlsx'));
+  toast(`ดาวน์โหลดแล้ว · สรุป ${d.summary.length} คน · ${d.logs.length} รายการ`);
+}
+function exportCsvData(d) {
+  const q = v => { const s = String(v ?? ''); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const lines = [[d.title], d.summaryHeader, ...d.summary, [], ['บันทึกเวลารายเวร'], d.logHeader, ...d.logs].map(r => r.map(q).join(','));
+  saveBlob(new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' }), exportName(d, 'csv'));
+  toast('ดาวน์โหลด CSV แล้ว');
+}
+
+/* ตั้งค่า */
+function fillSettings() {
+  const s = admin.settings; if (!s) return;
+  $('stSaved').textContent = s.LAT && s.LNG ? `${s.LAT}, ${s.LNG}` : 'ยังไม่ได้ตั้ง';
+  $('stHere').textContent = state.pos ? `${state.pos.lat.toFixed(6)}, ${state.pos.lng.toFixed(6)} (±${Math.round(state.pos.acc)} ม.)` : 'ยังไม่ได้รับตำแหน่ง GPS';
+  $('stRadius').value = s.RADIUS_M; $('stGrace').value = s.LATE_GRACE_MIN; $('stOpen').value = s.OPEN_BEFORE_MIN;
+  $('stM').value = s.SHIFT_M; $('stA').value = s.SHIFT_A; $('stN').value = s.SHIFT_N;
+}
+async function saveSettings(values, btn, msg) {
+  await withBusy(btn, async () => {
+    const r = await adminApi('adminSaveSettings', { values });
+    admin.settings = r.settings; fillSettings(); toast(msg || r.message); reloadConfig();
+  });
+}
+
+/* โหลดข้อมูลหน้าหลักใหม่หลังผู้ดูแลแก้ไข */
+async function reloadConfig() {
+  try {
+    state.cfg = await api('GET', { action: 'config' }); state.cfgError = false;
+    applyConfig();
+  } catch (e) {}
+}
+
+$('adminBtn').onclick = openAdmin;
+$('adminClose').onclick = closeAdmin;
+$('adminLogout').onclick = adminLogout;
+$('loginForm').onsubmit = (e) => { e.preventDefault(); admin.pw = $('adminPw').value; adminEnter(false); };
+document.querySelectorAll('#adminTabs .shift').forEach(b => b.onclick = () => showTab(b.dataset.tab));
+$('dayLoad').onclick = loadDay;
+$('staffForm').onsubmit = (e) => { e.preventDefault(); saveStaff(false); };
+$('sfCancel').onclick = () => editStaff(null);
+$('sfDelete').onclick = () => saveStaff(true);
+$('exBtn').onclick = () => withBusy($('exBtn'), exportXlsx);
+$('exCsv').onclick = () => withBusy($('exCsv'), async () => exportCsvData(await getExport()));
+$('stUseHere').onclick = () => {
+  const p = state.pos;
+  if (!p) return toast('ยังไม่ได้รับตำแหน่ง GPS — กด "อนุญาต" ให้ใช้ตำแหน่ง แล้วลองใหม่', 'bad');
+  if (p.acc > 100 && !confirm(`สัญญาณ GPS คลาดเคลื่อน ±${Math.round(p.acc)} ม. ยืนยันใช้ตำแหน่งนี้?`)) return;
+  if (!confirm(`ตั้งพิกัดหอผู้ป่วยเป็น\n${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}\nยืนยัน?`)) return;
+  saveSettings({ LAT: p.lat, LNG: p.lng }, $('stUseHere'), 'ตั้งพิกัดหอผู้ป่วยแล้ว ✅');
+};
+$('ruleForm').onsubmit = (e) => { e.preventDefault();
+  saveSettings({ RADIUS_M: $('stRadius').value, LATE_GRACE_MIN: $('stGrace').value, OPEN_BEFORE_MIN: $('stOpen').value,
+    SHIFT_M: $('stM').value, SHIFT_A: $('stA').value, SHIFT_N: $('stN').value }, e.submitter || $('ruleForm').querySelector('button')); };
+(() => { const t = bkkDateStr(Date.now()); $('dayDate').value = t; $('exMonth').value = t.slice(0, 7); })();
+
 init();
 </script>
 </body>

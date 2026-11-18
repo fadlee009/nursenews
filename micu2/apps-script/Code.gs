@@ -42,8 +42,12 @@ var DEFAULT_SETTINGS = [
   ['MAX_ACCURACY_M', 0, 'ไม่รับพิกัดที่คลาดเคลื่อนเกินกี่เมตร (0 = ไม่จำกัด)'],
   ['SHIFT_M', '08:00-16:00', 'เวลาเวรเช้า'],
   ['SHIFT_A', '16:00-24:00', 'เวลาเวรบ่าย'],
-  ['SHIFT_N', '00:00-08:00', 'เวลาเวรดึก']
+  ['SHIFT_N', '00:00-08:00', 'เวลาเวรดึก'],
+  ['ADMIN_PASSWORD', '', 'รหัสผ่านผู้ดูแล สำหรับปุ่ม ⚙️ ในหน้าเว็บ — อย่าแชร์ชีตนี้ให้คนทั่วไป']
 ];
+
+var SETTING_KEYS_EDITABLE = ['WARD_NAME', 'LAT', 'LNG', 'RADIUS_M', 'LATE_GRACE_MIN', 'OPEN_BEFORE_MIN',
+  'MAX_ACCURACY_M', 'SHIFT_M', 'SHIFT_A', 'SHIFT_N'];
 
 var SHIFT_DEFS = [
   { code: 'M', key: 'SHIFT_M', name: 'เช้า' },
@@ -76,6 +80,7 @@ function doPost(e) {
     lock.waitLock(20000);
     if (body.action === 'checkin') return json_(apiCheckIn_(body));
     if (body.action === 'checkout') return json_(apiCheckOut_(body));
+    if (String(body.action || '').indexOf('admin') === 0) return json_(apiAdmin_(body));
     return json_({ ok: false, error: 'ไม่รู้จักคำสั่ง' });
   } catch (err) {
     return json_({ ok: false, error: String(err.message || err) });
@@ -202,6 +207,160 @@ function apiCheckOut_(b) {
   r[C.OUT] = outVals[0][0]; r[C.OUT_STATUS] = outStatus; r[C.EARLY_MIN] = outVals[0][2];
   r[C.OUT_DIST] = geo.distance; r[C.OUT_LOC] = geo.text; r[C.HOURS] = hours;
   return { ok: true, message: 'ลงเวลาออกเวร' + r[C.SHIFT] + ' สำเร็จ', record: recordToObj_(r) };
+}
+
+
+/* ============================== ผู้ดูแล (ปุ่ม ⚙️ ในหน้าเว็บ) ============================== */
+
+function apiAdmin_(b) {
+  var s = getSettings_();
+  checkAdmin_(s, b.pw);
+  switch (b.action) {
+    case 'adminLogin': return { ok: true, settings: adminSettings_(s), staff: getStaff_() };
+    case 'adminSaveSettings': return adminSaveSettings_(b.values || {});
+    case 'adminSaveStaff': return adminSaveStaff_(b.staff || {});
+    case 'adminDay': return adminDay_(b.date);
+    case 'adminExport': return adminExport_(b.month);
+  }
+  throw new Error('ไม่รู้จักคำสั่ง');
+}
+
+function checkAdmin_(s, pw) {
+  var real = String(s.ADMIN_PASSWORD || '').trim();
+  if (!real) throw new Error('ยังไม่ได้ตั้งรหัสผ่านผู้ดูแล — ใส่ค่า ADMIN_PASSWORD ในชีต "ตั้งค่า"');
+  var cache = CacheService.getScriptCache();
+  var fails = Number(cache.get('adminFails') || 0);
+  if (fails >= 10) throw new Error('ใส่รหัสผ่านผิดหลายครั้ง ระบบล็อกชั่วคราว กรุณารอ 15 นาที');
+  if (String(pw || '') !== real) {
+    cache.put('adminFails', String(fails + 1), 900);
+    throw new Error('รหัสผ่านไม่ถูกต้อง');
+  }
+  if (fails) cache.remove('adminFails');
+}
+
+function adminSettings_(s) {
+  var o = {};
+  SETTING_KEYS_EDITABLE.forEach(function (k) { o[k] = s[k] === undefined ? '' : String(s[k]); });
+  return o;
+}
+
+function setSetting_(key, value) {
+  var sh = ss_().getSheetByName(SHEET_SETTINGS);
+  var keys = sh.getRange(1, 1, Math.max(1, sh.getLastRow()), 1).getValues();
+  for (var i = 1; i < keys.length; i++) {
+    if (String(keys[i][0]).trim() === key) {
+      sh.getRange(i + 1, 2).setNumberFormat('@').setValue(String(value));
+      return;
+    }
+  }
+  var def = DEFAULT_SETTINGS.filter(function (d) { return d[0] === key; })[0];
+  sh.appendRow([key, String(value), def ? def[2] : '']);
+}
+
+function adminSaveSettings_(v) {
+  var num = function (k, min, max) {
+    if (v[k] === undefined || v[k] === '') return;
+    var n = Number(v[k]);
+    if (!isFinite(n) || n < min || n > max) throw new Error('ค่า ' + k + ' ไม่ถูกต้อง (' + min + '–' + max + ')');
+    setSetting_(k, n);
+  };
+  if (v.LAT !== undefined || v.LNG !== undefined) {
+    var lat = Number(v.LAT), lng = Number(v.LNG);
+    if (!isFinite(lat) || !isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180 || (lat === 0 && lng === 0)) {
+      throw new Error('พิกัดไม่ถูกต้อง');
+    }
+    setSetting_('LAT', lat.toFixed(6));
+    setSetting_('LNG', lng.toFixed(6));
+  }
+  num('RADIUS_M', 20, 2000);
+  num('LATE_GRACE_MIN', 0, 120);
+  num('OPEN_BEFORE_MIN', 0, 480);
+  num('MAX_ACCURACY_M', 0, 5000);
+  ['SHIFT_M', 'SHIFT_A', 'SHIFT_N'].forEach(function (k) {
+    if (v[k] === undefined) return;
+    var t = String(v[k]).replace(/\s/g, '');
+    if (!/^([01]\d|2[0-4]):[0-5]\d-([01]\d|2[0-4]):[0-5]\d$/.test(t)) throw new Error('เวลาเวรต้องเป็นรูปแบบ 08:00-16:00');
+    setSetting_(k, t);
+  });
+  if (v.WARD_NAME !== undefined && String(v.WARD_NAME).trim()) setSetting_('WARD_NAME', String(v.WARD_NAME).trim().slice(0, 60));
+  return { ok: true, message: 'บันทึกการตั้งค่าแล้ว', settings: adminSettings_(getSettings_()) };
+}
+
+/** เพิ่ม/แก้ไข/ลบ รายชื่อ: { origId, id, name, position, active, remove } */
+function adminSaveStaff_(st) {
+  var sh = ss_().getSheetByName(SHEET_STAFF);
+  var id = String(st.id || '').trim(), name = String(st.name || '').trim();
+  var origId = String(st.origId || '').trim();
+  var last = Math.max(1, sh.getLastRow());
+  var vals = sh.getRange(1, 1, last, 2).getValues();
+  var rowOf = function (key) {
+    for (var i = 1; i < vals.length; i++) if (key && String(vals[i][0]).trim() === key) return i + 1;
+    return 0;
+  };
+  var row = rowOf(origId || id);
+  if (st.remove) {
+    if (!row) throw new Error('ไม่พบรายชื่อนี้');
+    sh.getRange(row, 1, 1, 4).setValues([['', '', '', false]]);
+    return { ok: true, message: 'ลบรายชื่อแล้ว', staff: getStaff_() };
+  }
+  if (!id || !name) throw new Error('กรุณาใส่รหัสพนักงานและชื่อ-สกุล');
+  if (!/^[\w\-.]{1,20}$/.test(id)) throw new Error('รหัสพนักงานใช้ได้เฉพาะตัวเลข/ตัวอักษรอังกฤษ ไม่เกิน 20 ตัว');
+  var dup = rowOf(id);
+  if (dup && dup !== row) throw new Error('รหัสพนักงาน ' + id + ' มีอยู่แล้ว');
+  if (!row) {
+    for (var i = 1; i < vals.length; i++) {
+      if (!String(vals[i][0]).trim() && !String(vals[i][1]).trim()) { row = i + 1; break; }
+    }
+    if (!row) row = last + 1;
+  }
+  sh.getRange(row, 1).setNumberFormat('@');
+  sh.getRange(row, 1, 1, 4).setValues([[id, name.slice(0, 80), String(st.position || '').trim().slice(0, 60), st.active !== false]]);
+  return { ok: true, message: 'บันทึกรายชื่อแล้ว', staff: getStaff_() };
+}
+
+function adminDay_(date) {
+  date = /^\d{4}-\d{2}-\d{2}$/.test(String(date || '')) ? date : bkkDateStr_(Date.now());
+  var order = { 'ดึก': 0, 'เช้า': 1, 'บ่าย': 2 };
+  var rows = readRecentLog_(3000).map(function (x) { return x.row; });
+  var now = Date.now();
+  var day = rows.filter(function (r) { return ds_(r[C.DATE]) === date; })
+    .sort(function (a, b) { return (order[a[C.SHIFT]] - order[b[C.SHIFT]]) || (toMs_(a[C.IN]) - toMs_(b[C.IN])); })
+    .map(recordToObj_);
+  var onDuty = rows.filter(function (r) { return r[C.IN] && !r[C.OUT] && now - toMs_(r[C.IN]) < 20 * 3600000; })
+    .map(recordToObj_);
+  return { ok: true, date: date, dateTh: thaiDate_(date), records: day, onDuty: onDuty };
+}
+
+/** แถวบันทึกเวลาสำหรับส่งออก (ไม่รวมพิกัด/อุปกรณ์) asText = true คืนวันที่/เวลาเป็นข้อความ */
+function exportLogRows_(logRows, asText) {
+  var order = { 'ดึก': 0, 'เช้า': 1, 'บ่าย': 2 };
+  var hm = function (v) { return v ? Utilities.formatDate(new Date(toMs_(v)), TZ, 'HH:mm') : ''; };
+  return logRows.slice().sort(function (a, b) {
+    return ds_(a[C.DATE]).localeCompare(ds_(b[C.DATE])) || (order[a[C.SHIFT]] - order[b[C.SHIFT]]) ||
+      (toMs_(a[C.IN]) - toMs_(b[C.IN]));
+  }).map(function (r) {
+    var p = ds_(r[C.DATE]).split('-');
+    var date = asText ? (p[2] + '/' + p[1] + '/' + p[0]) : new Date(Date.UTC(+p[0], +p[1] - 1, +p[2], 5));
+    var tin = asText ? hm(r[C.IN]) : (r[C.IN] ? new Date(toMs_(r[C.IN])) : '');
+    var tout = asText ? hm(r[C.OUT]) : (r[C.OUT] ? new Date(toMs_(r[C.OUT])) : '');
+    return [date, r[C.SHIFT], String(r[C.STAFF_ID]), r[C.NAME], tin, r[C.IN_STATUS], Number(r[C.LATE_MIN]) || 0,
+      tout, r[C.OUT_STATUS] || 'ไม่ได้ลงเวลาออก', Number(r[C.EARLY_MIN]) || 0,
+      r[C.HOURS] === '' ? '' : Number(r[C.HOURS]), r[C.IN_DIST], r[C.OUT_DIST]];
+  });
+}
+
+var EXPORT_LOG_HEADER = ['วันที่เวร', 'เวร', 'รหัสพนักงาน', 'ชื่อ-สกุล', 'เวลาเข้า', 'สถานะเข้า', 'นาทีสาย',
+  'เวลาออก', 'สถานะออก', 'นาทีออกก่อน', 'ชั่วโมงทำงาน', 'ระยะห่างตอนเข้า (ม.)', 'ระยะห่างตอนออก (ม.)'];
+
+function adminExport_(month) {
+  if (!/^\d{4}-\d{2}$/.test(String(month || ''))) throw new Error('กรุณาเลือกเดือน');
+  var m = computeMonthly_(month);
+  return {
+    ok: true, month: month, monthTh: thaiMonth_(month), title: m.title,
+    summaryHeader: m.header, summary: m.summary,
+    logHeader: EXPORT_LOG_HEADER, logs: exportLogRows_(m.logRows, true),
+    created: Utilities.formatDate(new Date(), TZ, 'dd/MM/yyyy HH:mm')
+  };
 }
 
 /* ============================== ตรรกะเวร ============================== */
@@ -344,7 +503,7 @@ function toMs_(v) { return v instanceof Date ? v.getTime() : new Date(v).getTime
 function recordToObj_(r) {
   var fmt = function (v) { return v ? Utilities.formatDate(new Date(toMs_(v)), TZ, 'HH:mm') : ''; };
   return {
-    id: r[C.ID], date: ds_(r[C.DATE]), dateTh: thaiDate_(ds_(r[C.DATE])), shift: r[C.SHIFT],
+    id: r[C.ID], staffId: String(r[C.STAFF_ID]), name: r[C.NAME], date: ds_(r[C.DATE]), dateTh: thaiDate_(ds_(r[C.DATE])), shift: r[C.SHIFT],
     inTime: fmt(r[C.IN]), inStatus: r[C.IN_STATUS], inDist: r[C.IN_DIST],
     outTime: fmt(r[C.OUT]), outStatus: r[C.OUT_STATUS], hours: r[C.HOURS]
   };
@@ -502,20 +661,8 @@ function menuExportExcel() {
  */
 function exportMonthlyExcel(month) {
   var m = computeMonthly_(month);
-  var order = { 'ดึก': 0, 'เช้า': 1, 'บ่าย': 2 };
-  var logs = m.logRows.slice().sort(function (a, b) {
-    return ds_(a[C.DATE]).localeCompare(ds_(b[C.DATE])) || (order[a[C.SHIFT]] - order[b[C.SHIFT]]) ||
-      (toMs_(a[C.IN]) - toMs_(b[C.IN]));
-  }).map(function (r) {
-    var p = ds_(r[C.DATE]).split('-');
-    // เที่ยงวันเวลาไทย เพื่อให้วันที่ไม่เลื่อนไม่ว่าโซนเวลาของสคริปต์เป็นอะไร
-    return [new Date(Date.UTC(+p[0], +p[1] - 1, +p[2], 5)), r[C.SHIFT], String(r[C.STAFF_ID]), r[C.NAME],
-      r[C.IN] ? new Date(toMs_(r[C.IN])) : '', r[C.IN_STATUS], Number(r[C.LATE_MIN]) || 0,
-      r[C.OUT] ? new Date(toMs_(r[C.OUT])) : '', r[C.OUT_STATUS] || 'ไม่ได้ลงเวลาออก', Number(r[C.EARLY_MIN]) || 0,
-      r[C.HOURS] === '' ? '' : Number(r[C.HOURS]), r[C.IN_DIST], r[C.OUT_DIST]];
-  });
-  var logHeader = ['วันที่เวร', 'เวร', 'รหัสพนักงาน', 'ชื่อ-สกุล', 'เวลาเข้า', 'สถานะเข้า', 'นาทีสาย',
-    'เวลาออก', 'สถานะออก', 'นาทีออกก่อน', 'ชั่วโมงทำงาน', 'ระยะห่างตอนเข้า (ม.)', 'ระยะห่างตอนออก (ม.)'];
+  var logs = exportLogRows_(m.logRows, false);
+  var logHeader = EXPORT_LOG_HEADER;
 
   var name = 'MICU 2 เวลาเข้า-ออกงาน ' + month;
   var out = SpreadsheetApp.create(name);
